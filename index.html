@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>团子的数字空间</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background: #050a07;
+  color: #d7ffe3;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  min-height: 100vh;
+}
+header {
+  padding: 22px;
+  border-bottom: 1px solid #174d2b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  color: #39ff78;
+  font-size: 21px;
+  font-weight: bold;
+  text-shadow: 0 0 12px #39ff78;
+}
+.status {
+  color: #39ff78;
+  font-size: 12px;
+}
+main {
+  width: 90%;
+  max-width: 760px;
+  margin: 65px auto;
+}
+.tag {
+  color: #39ff78;
+  letter-spacing: 3px;
+  font-size: 12px;
+}
+h1 {
+  font-size: clamp(48px, 12vw, 82px);
+  margin: 22px 0;
+  color: #39ff78;
+  text-shadow: 0 0 12px #20bd58, 0 0 35px #147c38;
+}
+.intro {
+  color: #a5cbb0;
+  line-height: 2;
+  font-size: 16px;
+}
+.terminal {
+  background: #09150d;
+  border: 1px solid #236b3a;
+  border-radius: 10px;
+  margin-top: 35px;
+  padding: 20px;
+  box-shadow: 0 0 20px #103a20;
+}
+.terminal-title {
+  color: #39ff78;
+  margin-bottom: 16px;
+}
+.terminal p {
+  color: #a5cbb0;
+  line-height: 2;
+  overflow-wrap: anywhere;
+}
+.green {
+  color: #39ff78;
+}
+section {
+  margin-top: 55px;
+}
+h2 {
+  color: #39ff78;
+  font-size: 22px;
+  border-left: 3px solid #39ff78;
+  padding-left: 12px;
+  margin-bottom: 20px;
+}
+.card {
+  background: #09150d;
+  border: 1px solid #194b2b;
+  border-radius: 9px;
+  padding: 18px;
+  margin: 12px 0;
+  line-height: 1.8;
+}
+.card strong {
+  color: #39ff78;
+}
+.links a {
+  display: inline-block;
+  color: #39ff78;
+  text-decoration: none;
+  border: 1px solid #267441;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin: 5px;
+}
+.links a:hover {
+  background: #12351d;
+}
+footer {
+  text-align: center;
+  padding: 35px 10px;
+  color: #64866d;
+  border-top: 1px solid #174d2b;
+  margin-top: 70px;
+  font-size: 13px;
+}
+.cursor {
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TUANZI.exe</div>
+  <div class="status">● SYSTEM ONLINE</div>
+</header>
+
+<main>
+  <div class="tag">WELCOME TO MY DIGITAL WORLD</div>
+
+  <h1>团子<span class="cursor">_</span></h1>
+
+  <p class="intro">
+    你好，欢迎来到我的数字空间。<br>
+    探索科技，学习编程，保持好奇。<br>
+    这里是属于团子的个人主页。
+  </p>
+
+  <div class="terminal">
+    <div class="terminal-title">root@tuanzi:~#</div>
+    <p><span class="green">$</span> whoami</p>
+    <p>团子 - 独立探索者</p>
+    <p><span class="green">$</span> status</p>
+    <p>System: Online</p>
+    <p>Mode: Learning</p>
+    <p><span class="green">$</span> echo "Hello World!"</p>
+    <p class="green">Hello World!</p>
+  </div>
+
+  <section>
+    <h2>关于我 / ABOUT</h2>
+    <div class="card">
+      <strong>昵称：</strong>团子<br>
+      <strong>身份：</strong>科技爱好者<br>
+      <strong>兴趣：</strong>网络技术、编程、游戏<br>
+      <strong>目标：</strong>不断学习，不断进步。
+    </div>
+  </section>
+
+  <section>
+    <h2>我的技能 / SKILLS</h2>
+    <div class="card">
+      <strong>[01]</strong> HTML 网页制作<br>
+      <strong>[02]</strong> Linux 基础学习<br>
+      <strong>[03]</strong> 网络安全基础知识<br>
+      <strong>[04]</strong> 持续探索新技术
+    </div>
+  </section>
+
+  <section>
+    <h2>数字空间 / LINKS</h2>
+    <div class="card links">
+      <a href="#about">个人主页</a>
+      <a href="#top" onclick="window.scrollTo(0,0);return false;">返回顶部</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 2026 TUANZI DIGITAL WORLD<br>
+  POWERED BY GITHUB PAGES
+</footer>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>团子的数字空间</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background: #050a07;
+  color: #d7ffe3;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  min-height: 100vh;
+}
+header {
+  padding: 22px;
+  border-bottom: 1px solid #174d2b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  color: #39ff78;
+  font-size: 21px;
+  font-weight: bold;
+  text-shadow: 0 0 12px #39ff78;
+}
+.status {
+  color: #39ff78;
+  font-size: 12px;
+}
+main {
+  width: 90%;
+  max-width: 760px;
+  margin: 65px auto;
+}
+.tag {
+  color: #39ff78;
+  letter-spacing: 3px;
+  font-size: 12px;
+}
+h1 {
+  font-size: clamp(48px, 12vw, 82px);
+  margin: 22px 0;
+  color: #39ff78;
+  text-shadow: 0 0 12px #20bd58, 0 0 35px #147c38;
+}
+.intro {
+  color: #a5cbb0;
+  line-height: 2;
+  font-size: 16px;
+}
+.terminal {
+  background: #09150d;
+  border: 1px solid #236b3a;
+  border-radius: 10px;
+  margin-top: 35px;
+  padding: 20px;
+  box-shadow: 0 0 20px #103a20;
+}
+.terminal-title {
+  color: #39ff78;
+  margin-bottom: 16px;
+}
+.terminal p {
+  color: #a5cbb0;
+  line-height: 2;
+  overflow-wrap: anywhere;
+}
+.green {
+  color: #39ff78;
+}
+section {
+  margin-top: 55px;
+}
+h2 {
+  color: #39ff78;
+  font-size: 22px;
+  border-left: 3px solid #39ff78;
+  padding-left: 12px;
+  margin-bottom: 20px;
+}
+.card {
+  background: #09150d;
+  border: 1px solid #194b2b;
+  border-radius: 9px;
+  padding: 18px;
+  margin: 12px 0;
+  line-height: 1.8;
+}
+.card strong {
+  color: #39ff78;
+}
+.links a {
+  display: inline-block;
+  color: #39ff78;
+  text-decoration: none;
+  border: 1px solid #267441;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin: 5px;
+}
+.links a:hover {
+  background: #12351d;
+}
+footer {
+  text-align: center;
+  padding: 35px 10px;
+  color: #64866d;
+  border-top: 1px solid #174d2b;
+  margin-top: 70px;
+  font-size: 13px;
+}
+.cursor {
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TUANZI.exe</div>
+  <div class="status">● SYSTEM ONLINE</div>
+</header>
+
+<main>
+  <div class="tag">WELCOME TO MY DIGITAL WORLD</div>
+
+  <h1>团子<span class="cursor">_</span></h1>
+
+  <p class="intro">
+    你好，欢迎来到我的数字空间。<br>
+    探索科技，学习编程，保持好奇。<br>
+    这里是属于团子的个人主页。
+  </p>
+
+  <div class="terminal">
+    <div class="terminal-title">root@tuanzi:~#</div>
+    <p><span class="green">$</span> whoami</p>
+    <p>团子 - 独立探索者</p>
+    <p><span class="green">$</span> status</p>
+    <p>System: Online</p>
+    <p>Mode: Learning</p>
+    <p><span class="green">$</span> echo "Hello World!"</p>
+    <p class="green">Hello World!</p>
+  </div>
+
+  <section>
+    <h2>关于我 / ABOUT</h2>
+    <div class="card">
+      <strong>昵称：</strong>团子<br>
+      <strong>身份：</strong>科技爱好者<br>
+      <strong>兴趣：</strong>网络技术、编程、游戏<br>
+      <strong>目标：</strong>不断学习，不断进步。
+    </div>
+  </section>
+
+  <section>
+    <h2>我的技能 / SKILLS</h2>
+    <div class="card">
+      <strong>[01]</strong> HTML 网页制作<br>
+      <strong>[02]</strong> Linux 基础学习<br>
+      <strong>[03]</strong> 网络安全基础知识<br>
+      <strong>[04]</strong> 持续探索新技术
+    </div>
+  </section>
+
+  <section>
+    <h2>数字空间 / LINKS</h2>
+    <div class="card links">
+      <a href="#about">个人主页</a>
+      <a href="#top" onclick="window.scrollTo(0,0);return false;">返回顶部</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 2026 TUANZI DIGITAL WORLD<br>
+  POWERED BY GITHUB PAGES
+</footer>
+
+</body>
+</html>
