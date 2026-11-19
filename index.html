@@ -410,13 +410,15 @@ let crate={
 }
 ;
 let doorOpen=false,chestOpened=localStorage.getItem("tuanziChestOpened")==="yes";
+/* Boss 增加死亡状态字段：dead / deathTimer / deathParticles */
 let boss={
   x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0,
-  telegraph:0,telegraphKind:"",telegraphDir:1
+  telegraph:0,telegraphKind:"",telegraphDir:1,
+  dead:false,deathTimer:0,deathParticles:[]
 }
 ;
 let bossProjectiles=[],attackCooldown=0,toastFrames=0;
-/* 新增：推箱「松开」冷却计时器。按下「🖐️ 松开箱子」后 0.5 秒内不再推动箱子。 */
+/* 推箱「松开」冷却计时器。按下「🖐️ 松开箱子」后 0.5 秒内不再推动箱子。 */
 let noPushTimer=0;
 const cosmetics=[
 {
@@ -523,7 +525,8 @@ function makeLevel(){
   if(level===5){
     boss={
       x:2100,y:GROUND-146,hp:300,maxHp:300,attackTimer:1.15,flash:0,skillTimer:3.2,charge:0,chargeDir:-1,phase:0,
-      telegraph:0,telegraphKind:"",telegraphDir:1
+      telegraph:0,telegraphKind:"",telegraphDir:1,
+      dead:false,deathTimer:0,deathParticles:[]
     }
     ;
     for(let i=0;i<10;i++)gold.push({
@@ -969,79 +972,129 @@ function update(dt){
   }
 
   // ============================================================
-  // 第五关 Boss：更长前摇 + 强化技能
+  // 第五关 Boss：长前摇 + 强化技能 + 死亡爆炸
+  // 关键修复：
+  //   1. 火球方向改为瞄准玩家（以前 cos(angle) 永远为正，只会往右飞）
+  //   2. 冲锋方向改用 Boss 中心与玩家中心比较（以前用左边缘比较会误判）
+  //   3. Boss 血量为 0 时进入死亡状态，播放爆炸粒子，血条显示“已击败”
   // ============================================================
-  if(level===5&&boss.hp>0){
-    boss.attackTimer-=dt;
-    boss.skillTimer-=dt;
-    boss.phase+=dt*2.2;
+  if(level===5){
+    if(boss.hp>0){
+      boss.attackTimer-=dt;
+      boss.skillTimer-=dt;
+      boss.phase+=dt*2.2;
+      // 受击闪白计时器递减（以前漏了，导致 Boss 一直闪白）
+      if(boss.flash>0)boss.flash-=dt*60;
 
-    // ---- 前摇阶段 ----
-    if(boss.telegraph>0){
-      boss.telegraph-=dt;
-      if(boss.telegraph<=0){
-        // 前摇结束，释放对应技能
-        if(boss.telegraphKind==="fire"){
-          const baseX=boss.x+62, baseY=GROUND-85;
-          for(let i=0;i<5;i++){
-            const angle=-0.42+i*0.21;
-            const speed=310+Math.abs(i-2)*30;
+      // ---- 前摇阶段 ----
+      if(boss.telegraph>0){
+        boss.telegraph-=dt;
+        if(boss.telegraph<=0){
+          // 前摇结束，释放对应技能
+          if(boss.telegraphKind==="fire"){
+            // 火球瞄准玩家方向发射扇形
+            const bx0=boss.x+62, by0=GROUND-85;
+            const targetX=player.x+player.w/2;
+            const targetY=player.y+player.h/2;
+            const baseAngle=Math.atan2(targetY-by0, targetX-bx0);
+            const speed=330;
+            for(let i=0;i<5;i++){
+              const angle=baseAngle+(i-2)*0.13;
+              bossProjectiles.push({
+                x:bx0,y:by0,
+                vx:Math.cos(angle)*speed,
+                vy:Math.sin(angle)*speed,
+                life:5.0,r:13,kind:"fire"
+              });
+            }
+            say("🔥 五连暗影火球！");
+          }else if(boss.telegraphKind==="wave"){
             bossProjectiles.push({
-              x:baseX,y:baseY+i*17,
-              vx:Math.cos(angle)*speed,
-              vy:Math.sin(angle)*speed*.32+i*42,
-              life:5.0,r:13,kind:"fire"
+              x:boss.x-80,y:GROUND-15,vx:-420,vy:0,life:5.2,r:22,kind:"wave"
             });
+            bossProjectiles.push({
+              x:boss.x+140,y:GROUND-15,vx:420,vy:0,life:5.2,r:22,kind:"wave"
+            });
+            say("⚡ 双向地面冲击波！必须跳起来躲开！");
+          }else if(boss.telegraphKind==="charge"){
+            boss.charge=0.92;
+            boss.chargeDir=boss.telegraphDir;
+            say("💢 邪恶团子冲锋！");
           }
-          say("🔥 五连暗影火球！");
-        }else if(boss.telegraphKind==="wave"){
-          bossProjectiles.push({
-            x:boss.x-80,y:GROUND-15,vx:-420,vy:0,life:5.2,r:22,kind:"wave"
-          });
-          bossProjectiles.push({
-            x:boss.x+140,y:GROUND-15,vx:420,vy:0,life:5.2,r:22,kind:"wave"
-          });
-          say("⚡ 双向地面冲击波！必须跳起来躲开！");
-        }else if(boss.telegraphKind==="charge"){
-          boss.charge=0.92;
-          boss.chargeDir=boss.telegraphDir;
-          say("💢 邪恶团子冲锋！");
+          boss.telegraphKind="";
+          boss.telegraph=0;
+          boss.skillTimer=3.8+Math.random()*1.2;
         }
-        boss.telegraphKind="";
-        boss.telegraph=0;
-        boss.skillTimer=3.8+Math.random()*1.2;
       }
-    }
-    // ---- 冲锋执行 ----
-    else if(boss.charge>0){
-      boss.charge-=dt;
-      boss.x+=boss.chargeDir*560*dt;
-      if(Math.abs(player.x-boss.x)<98 && player.y+player.h>GROUND-130)hit();
-      if(boss.charge<=0){
-        boss.x=Math.max(520,Math.min(LEVEL_LENGTH-420,boss.x));
-        boss.attackTimer=0.75;
+      // ---- 冲锋执行 ----
+      else if(boss.charge>0){
+        boss.charge-=dt;
+        boss.x+=boss.chargeDir*560*dt;
+        if(Math.abs(player.x-boss.x)<98 && player.y+player.h>GROUND-130)hit();
+        if(boss.charge<=0){
+          boss.x=Math.max(520,Math.min(LEVEL_LENGTH-420,boss.x));
+          boss.attackTimer=0.75;
+        }
       }
-    }
-    // ---- 选择下一个技能并进入前摇 ----
-    else if(boss.skillTimer<=0){
-      const roll=Math.floor(Math.random()*3);
-      if(roll===0){
-        boss.telegraph=1.55;
-        boss.telegraphKind="fire";
-        say("⚠ 邪恶团子正在凝聚暗影火球……");
-      }else if(roll===1){
-        boss.telegraph=1.35;
-        boss.telegraphKind="wave";
-        say("⚠ 地面开始震动！冲击波即将来袭！");
-      }else{
-        boss.telegraph=1.75;
-        boss.telegraphKind="charge";
-        boss.telegraphDir=player.x<boss.x?-1:1;
-        say("⚠ 邪恶团子压低身体，准备冲锋！");
+      // ---- 选择下一个技能并进入前摇 ----
+      else if(boss.skillTimer<=0){
+        const roll=Math.floor(Math.random()*3);
+        if(roll===0){
+          boss.telegraph=1.55;
+          boss.telegraphKind="fire";
+          say("⚠ 邪恶团子正在凝聚暗影火球……");
+        }else if(roll===1){
+          boss.telegraph=1.35;
+          boss.telegraphKind="wave";
+          say("⚠ 地面开始震动！冲击波即将来袭！");
+        }else{
+          boss.telegraph=1.75;
+          boss.telegraphKind="charge";
+          // 冲锋方向：用 Boss 中心与玩家中心比较，避免站在脸上反方向冲
+          const bossCenter=boss.x+62;
+          const playerCenter=player.x+player.w/2;
+          boss.telegraphDir=playerCenter<bossCenter?-1:1;
+          say("⚠ 邪恶团子压低身体，准备冲锋！");
+        }
+      }
+
+      // 身体接触伤害
+      if(Math.abs(player.x-boss.x)<92&&player.y+player.h>GROUND-125)hit();
+    } else {
+      // ============ Boss 死亡处理 ============
+      if(!boss.dead){
+        boss.dead=true;
+        boss.deathTimer=2.2;
+        bossProjectiles=[]; // 死亡瞬间清空残留弹幕，避免最后被阴
+        // 生成爆炸粒子
+        for(let i=0;i<70;i++){
+          const ang=Math.random()*Math.PI*2;
+          const sp=2+Math.random()*9;
+          boss.deathParticles.push({
+            x:boss.x+62+(Math.random()-0.5)*70,
+            y:GROUND-146+90+(Math.random()-0.5)*80,
+            vx:Math.cos(ang)*sp,
+            vy:Math.sin(ang)*sp-3,
+            life:0.9+Math.random()*1.5,
+            size:3+Math.random()*7,
+            color:Math.random()<0.34?"#ffd166":(Math.random()<0.5?"#ff6b4a":"#9b42d6")
+          });
+        }
+      }
+      if(boss.deathTimer>0){
+        boss.deathTimer-=dt;
+        boss.deathParticles.forEach(p=>{
+          p.x+=p.vx*dt*60;
+          p.y+=p.vy*dt*60;
+          p.vy+=0.4*dt*60;
+          p.vx*=0.99;
+          p.life-=dt;
+        });
+        boss.deathParticles=boss.deathParticles.filter(p=>p.life>0);
       }
     }
 
-    // ---- 弹幕更新 ----
+    // ---- 弹幕统一更新（Boss 死亡后残留弹幕继续飞完） ----
     bossProjectiles.forEach(p=>{
       p.x+=p.vx*dt;
       p.y+=(p.vy||0)*dt;
@@ -1072,9 +1125,6 @@ function update(dt){
       }
     });
     bossProjectiles=bossProjectiles.filter(p=>p.life>0);
-
-    // 身体接触伤害
-    if(Math.abs(player.x-boss.x)<92&&player.y+player.h>GROUND-125)hit();
   }
 
   if(player.y>H+80){
@@ -1343,75 +1393,101 @@ function draw(){
   }
   if(level===5){
     const bx=boss.x-scroll,by=GROUND-146;
-    const rage=boss.hp<boss.maxHp*0.35;
-    ctx.save();
-    ctx.globalAlpha=0.22+Math.sin(frame*.12)*.06;
-    ctx.fillStyle=rage?"#ff334f":"#9b42d6";
-    ctx.beginPath();ctx.ellipse(bx+62,GROUND-48,88,24,0,0,7);ctx.fill();
-    ctx.restore();
-    ctx.fillStyle=boss.flash>0?"#fff":(rage?"#d83c55":"#8751a8");
-    ctx.beginPath();ctx.ellipse(bx+62,by+93,68,72,0,0,7);ctx.fill();
-    ctx.fillStyle="#572b75";
-    ctx.beginPath();
-    ctx.ellipse(bx+34,by+27,17,35,-.4,0,7);
-    ctx.ellipse(bx+90,by+27,17,35,.4,0,7);
-    ctx.fill();
-    ctx.fillStyle="#fff";
-    ctx.beginPath();ctx.arc(bx+39,by+79,15,0,7);ctx.arc(bx+85,by+79,15,0,7);ctx.fill();
-    ctx.fillStyle="#26172e";
-    ctx.beginPath();ctx.arc(bx+42,by+80,7,0,7);ctx.arc(bx+88,by+80,7,0,7);ctx.fill();
-    ctx.strokeStyle="#2b1538";ctx.lineWidth=8;ctx.lineCap="round";
-    ctx.beginPath();ctx.moveTo(bx+45,by+119);ctx.quadraticCurveTo(bx+62,by+132,bx+82,by+118);ctx.stroke();
-    ctx.fillStyle="#f5c84c";ctx.beginPath();
-    ctx.moveTo(bx+20,by+31);ctx.lineTo(bx+25,by-3);ctx.lineTo(bx+46,by+17);
-    ctx.lineTo(bx+62,by-12);ctx.lineTo(bx+78,by+17);ctx.lineTo(bx+100,by-3);
-    ctx.lineTo(bx+105,by+31);ctx.closePath();ctx.fill();
-    ctx.fillStyle="#e64c68";ctx.fillRect(bx+3,by+139,118,16);
 
-    // ---- Boss 前摇视觉预警 ----
-    if(boss.telegraph>0){
-      const prog=1-(boss.telegraph/(boss.telegraphKind==="charge"?1.75:boss.telegraphKind==="fire"?1.55:1.35));
+    if(boss.hp>0){
+      // ============ Boss 存活：正常绘制 ============
+      const rage=boss.hp<boss.maxHp*0.35;
       ctx.save();
-      ctx.globalAlpha=0.28+Math.sin(frame*.2)*.10;
-      if(boss.telegraphKind==="fire"){
-        ctx.fillStyle="#ff6b4a";
-        ctx.beginPath();
-        ctx.ellipse(bx+62,by+80,70+prog*20,80+prog*20,0,0,7);
-        ctx.fill();
-      }else if(boss.telegraphKind==="wave"){
-        ctx.fillStyle="#f7b83e";
-        ctx.fillRect(0,GROUND-8,W,8);
-      }else if(boss.telegraphKind==="charge"){
-        ctx.fillStyle="#ff334f";
-        ctx.fillRect(0,GROUND-18,W,18);
-      }
+      ctx.globalAlpha=0.22+Math.sin(frame*.12)*.06;
+      ctx.fillStyle=rage?"#ff334f":"#9b42d6";
+      ctx.beginPath();ctx.ellipse(bx+62,GROUND-48,88,24,0,0,7);ctx.fill();
       ctx.restore();
-
+      ctx.fillStyle=boss.flash>0?"#fff":(rage?"#d83c55":"#8751a8");
+      ctx.beginPath();ctx.ellipse(bx+62,by+93,68,72,0,0,7);ctx.fill();
+      ctx.fillStyle="#572b75";
+      ctx.beginPath();
+      ctx.ellipse(bx+34,by+27,17,35,-.4,0,7);
+      ctx.ellipse(bx+90,by+27,17,35,.4,0,7);
+      ctx.fill();
       ctx.fillStyle="#fff";
-      ctx.font="bold 20px Arial";
-      ctx.textAlign="center";
-      if(boss.telegraphKind==="fire")ctx.fillText("⚠ 暗影火球蓄力中",W/2,GROUND-58);
-      else if(boss.telegraphKind==="wave")ctx.fillText("⚠ 冲击波预警",W/2,GROUND-58);
-      else if(boss.telegraphKind==="charge")ctx.fillText("⚠ 冲锋方向锁定",W/2,GROUND-58);
-      ctx.textAlign="left";
+      ctx.beginPath();ctx.arc(bx+39,by+79,15,0,7);ctx.arc(bx+85,by+79,15,0,7);ctx.fill();
+      ctx.fillStyle="#26172e";
+      ctx.beginPath();ctx.arc(bx+42,by+80,7,0,7);ctx.arc(bx+88,by+80,7,0,7);ctx.fill();
+      ctx.strokeStyle="#2b1538";ctx.lineWidth=8;ctx.lineCap="round";
+      ctx.beginPath();ctx.moveTo(bx+45,by+119);ctx.quadraticCurveTo(bx+62,by+132,bx+82,by+118);ctx.stroke();
+      ctx.fillStyle="#f5c84c";ctx.beginPath();
+      ctx.moveTo(bx+20,by+31);ctx.lineTo(bx+25,by-3);ctx.lineTo(bx+46,by+17);
+      ctx.lineTo(bx+62,by-12);ctx.lineTo(bx+78,by+17);ctx.lineTo(bx+100,by-3);
+      ctx.lineTo(bx+105,by+31);ctx.closePath();ctx.fill();
+      ctx.fillStyle="#e64c68";ctx.fillRect(bx+3,by+139,118,16);
 
-      if(boss.telegraphKind==="charge"){
-        ctx.strokeStyle="#ff5266";
-        ctx.lineWidth=4;
-        ctx.setLineDash([12,8]);
-        ctx.beginPath();
-        ctx.moveTo(bx+62,GROUND-30);
-        ctx.lineTo(bx+62+boss.telegraphDir*260,GROUND-30);
-        ctx.stroke();
-        ctx.setLineDash([]);
+      // ---- Boss 前摇视觉预警 ----
+      if(boss.telegraph>0){
+        const prog=1-(boss.telegraph/(boss.telegraphKind==="charge"?1.75:boss.telegraphKind==="fire"?1.55:1.35));
+        ctx.save();
+        ctx.globalAlpha=0.28+Math.sin(frame*.2)*.10;
+        if(boss.telegraphKind==="fire"){
+          ctx.fillStyle="#ff6b4a";
+          ctx.beginPath();
+          ctx.ellipse(bx+62,by+80,70+prog*20,80+prog*20,0,0,7);
+          ctx.fill();
+        }else if(boss.telegraphKind==="wave"){
+          ctx.fillStyle="#f7b83e";
+          ctx.fillRect(0,GROUND-8,W,8);
+        }else if(boss.telegraphKind==="charge"){
+          ctx.fillStyle="#ff334f";
+          ctx.fillRect(0,GROUND-18,W,18);
+        }
+        ctx.restore();
+
+        ctx.fillStyle="#fff";
+        ctx.font="bold 20px Arial";
+        ctx.textAlign="center";
+        if(boss.telegraphKind==="fire")ctx.fillText("⚠ 暗影火球蓄力中",W/2,GROUND-58);
+        else if(boss.telegraphKind==="wave")ctx.fillText("⚠ 冲击波预警",W/2,GROUND-58);
+        else if(boss.telegraphKind==="charge")ctx.fillText("⚠ 冲锋方向锁定",W/2,GROUND-58);
+        ctx.textAlign="left";
+
+        if(boss.telegraphKind==="charge"){
+          ctx.strokeStyle="#ff5266";
+          ctx.lineWidth=4;
+          ctx.setLineDash([12,8]);
+          ctx.beginPath();
+          ctx.moveTo(bx+62,GROUND-30);
+          ctx.lineTo(bx+62+boss.telegraphDir*260,GROUND-30);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
       }
+
+      if(boss.charge>0){
+        ctx.fillStyle="rgba(255,55,75,.28)";ctx.fillRect(0,GROUND-30,W,30);
+        ctx.fillStyle="#ff5266";ctx.font="bold 18px Arial";
+        ctx.fillText("⚠ BOSS 冲锋！",W/2-70,GROUND-42);
+      }
+    } else {
+      // ============ Boss 死亡：爆炸粒子 + 余烬 ============
+      boss.deathParticles.forEach(p=>{
+        ctx.save();
+        const alpha=Math.max(0,Math.min(1,p.life));
+        ctx.globalAlpha=alpha;
+        ctx.fillStyle=p.color;
+        ctx.beginPath();
+        ctx.arc(p.x-scroll,p.y,Math.max(1,p.size*Math.min(1,p.life)),0,7);
+        ctx.fill();
+        ctx.restore();
+      });
+      // 地面焦痕
+      ctx.save();
+      ctx.globalAlpha=Math.min(0.6,boss.deathTimer);
+      ctx.fillStyle="#2a1530";
+      ctx.beginPath();
+      ctx.ellipse(bx+62,GROUND-4,80,10,0,0,7);
+      ctx.fill();
+      ctx.restore();
     }
 
-    if(boss.charge>0){
-      ctx.fillStyle="rgba(255,55,75,.28)";ctx.fillRect(0,GROUND-30,W,30);
-      ctx.fillStyle="#ff5266";ctx.font="bold 18px Arial";
-      ctx.fillText("⚠ BOSS 冲锋！",W/2-70,GROUND-42);
-    }
+    // ---- 弹幕绘制（Boss 死亡后残留弹幕继续画完） ----
     bossProjectiles.forEach(p=>{
       ctx.fillStyle=p.kind==="wave"?"#f7b83e":"#e65d52";
       ctx.beginPath();
@@ -1419,10 +1495,18 @@ function draw(){
       else ctx.arc(p.x-scroll,p.y,p.r||14,0,7);
       ctx.fill();
     });
+
+    // ---- 血条 UI ----
     ctx.fillStyle="rgba(25,17,38,.88)";ctx.fillRect(12,10,W-24,42);
     ctx.fillStyle="#fff";ctx.font="bold 17px Arial";
     ctx.fillText("👑 邪恶团子 · 最终 Boss",24,29);
-    ctx.textAlign="right";ctx.fillText(Math.ceil(boss.hp)+" / "+boss.maxHp,W-24,29);
+    ctx.textAlign="right";
+    if(boss.hp>0){
+      ctx.fillText(Math.ceil(boss.hp)+" / "+boss.maxHp,W-24,29);
+    }else{
+      ctx.fillStyle="#a9f0d0";
+      ctx.fillText("已击败",W-24,29);
+    }
     ctx.textAlign="left";
     ctx.fillStyle="#49314f";ctx.fillRect(24,35,W-48,10);
     const hpw=(W-48)*Math.max(0,boss.hp/boss.maxHp);
@@ -1430,7 +1514,12 @@ function draw(){
     grad.addColorStop(0,"#ff334f");grad.addColorStop(1,"#ffb347");
     ctx.fillStyle=grad;ctx.fillRect(24,35,hpw,10);
     ctx.fillStyle="#fff";ctx.font="bold 15px Arial";
-    ctx.fillText("普通攻击 -5　传奇大葱 -15",20,76);
+    if(boss.hp>0){
+      ctx.fillText("普通攻击 -5　传奇大葱 -15",20,76);
+    }else{
+      ctx.fillStyle="#a9f0d0";
+      ctx.fillText("走到终点完成关卡！",20,76);
+    }
   }
   // 终点
   const finish=LEVEL_LENGTH-scroll;
