@@ -1,272 +1,4 @@
-!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🍡 团子冒险世界</title>
-<style>
-*{
-  box-sizing:border-box
-}
-:root{
-  --mint:#a9f0d0;
-  --deep:#11172b;
-  --panel:#26344f
-}
-body{
-  margin:0;
-  padding:12px;
-  text-align:center;
-  background:var(--deep);
-  color:white;
-  font-family:Arial,system-ui,sans-serif
-}
-h1{
-  color:var(--mint);
-  margin:8px
-}
-.info{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:8px;
-  margin:12px
-}
-.info span{
-  background:#27334e;
-  padding:9px 12px;
-  border-radius:12px;
-  font-weight:bold
-}
-canvas{
-  display:block;
-  width:100%;
-  max-width:960px;
-  height:auto;
-  margin:auto;
-  border:3px solid white;
-  border-radius:15px;
-  background:#9be7f5;
-  touch-action:none
-}
-button{
-  border:0;
-  border-radius:11px;
-  padding:12px 16px;
-  margin:5px;
-  font-weight:bold;
-  font-size:15px;
-  background:var(--mint);
-  color:#17352c;
-  cursor:pointer;
-  touch-action:manipulation
-}
-button:active{
-  transform:scale(.96)
-}
-button:disabled{
-  opacity:.55
-}
-#overlay{
-  position:fixed;
-  inset:0;
-  z-index:20;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:15px;
-  background:#10172bee
-}
-.panel{
-  width:min(470px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:var(--panel);
-  border:2px solid #9ee8cf;
-  border-radius:22px;
-  padding:22px;
-  box-shadow:0 15px 50px #0008
-}
-.panel h2{
-  color:var(--mint)
-}
-.panel p{
-  line-height:1.7
-}
-.hidden{
-  display:none!important
-}
-.big{
-  font-size:65px
-}
-#msg{
-  color:#ffe49b;
-  min-height:24px
-}
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  margin:12px auto;
-  max-width:500px
-}
-.controls button{
-  width:85px;
-  height:65px;
-  font-size:25px;
-  touch-action:none;
-  user-select:none;
-  -webkit-user-select:none
-}
-#jump{
-  background:#ffd166
-}
-#attack{
-  background:#ffb3a7
-}
-#shopItems{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px
-}
-.shopItem{
-  background:#344461;
-  padding:12px;
-  border-radius:12px
-}
-.shopItem button{
-  font-size:13px
-}
-footer{
-  margin:25px auto;
-  color:#aebbd0;
-  font-size:12px;
-  line-height:1.8
-}
-.small{
-  font-size:12px;
-  color:#b9c6db
-}
-input{
-  width:130px;
-  padding:11px;
-  border-radius:10px;
-  border:1px solid #9ee8cf;
-  background:#17243b;
-  color:white
-}
-@media(max-width:520px){
-  body{
-    padding:7px
-  }
-  .controls button{
-    width:76px;
-    height:62px
-  }
-  .panel{
-    padding:17px
-  }
-}
-/* ===== 精致界面增强 ===== */
-:root {
-  --mint: #a9f0d0;
-  --mint-bright: #c8ffe8;
-  --gold: #ffd166;
-  --coral: #ff9e9e;
-  --deep: #10182c;
-  --panel: #263650;
-}
-body {
-  min-height: 100vh;
-  background:
-  radial-gradient(circle at 12% 8%, rgba(95, 190, 169, .16), transparent 28%),
-  radial-gradient(circle at 88% 18%, rgba(109, 145, 220, .15), transparent 30%),
-  linear-gradient(145deg, #10182c, #17243b 55%, #10182c);
-}
-h1 {
-  text-shadow: 0 3px 18px rgba(119, 255, 211, .22);
-  letter-spacing: 1px;
-}
-.info span {
-  border: 1px solid rgba(184, 255, 225, .16);
-  box-shadow: 0 5px 16px rgba(0, 0, 0, .16);
-  backdrop-filter: blur(8px);
-}
-canvas {
-  box-shadow: 0 18px 55px rgba(0, 0, 0, .34), 0 0 0 1px rgba(205,255,236,.16);
-}
-button {
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 5px 0 rgba(0, 0, 0, .16), 0 8px 20px rgba(0,0,0,.12);
-  transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
-}
-button:hover {
-  filter: brightness(1.07);
-  transform: translateY(-1px);
-}
-button:active {
-  transform: translateY(2px) scale(.98);
-  box-shadow: 0 2px 0 rgba(0,0,0,.16);
-}
-button:focus-visible, input:focus-visible {
-  outline: 3px solid #fff0a8;
-  outline-offset: 3px;
-}
-#left, #right {
-  background: linear-gradient(180deg, #b8f4dc, #7dd9b7);
-}
-#jump {
-  background: linear-gradient(180deg, #ffe59b, #ffc64e);
-}
-#attack {
-  background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
-}
-#msg {
-  padding: 8px 12px;
-  margin: 7px auto;
-  width: min(960px, 96%);
-  border: 1px solid rgba(255, 226, 154, .15);
-  border-radius: 12px;
-  background: rgba(31, 45, 68, .55);
-}
-.panel {
-  background:
-  radial-gradient(circle at 100% 0%, rgba(169,240,208,.12), transparent 35%),
-  linear-gradient(145deg, #2b3c59, #202d46);
-  border: 1px solid rgba(195,255,231,.55);
-  box-shadow: 0 25px 80px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.08);
-  animation: panelIn .22s ease-out;
-}
-@keyframes panelIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.panel h2 {
-  text-shadow: 0 2px 14px rgba(169,240,208,.16);
-}
-.shopItem {
-  border: 1px solid rgba(196,255,230,.12);
-  background: linear-gradient(145deg, #3b506f, #2c3e5b);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-}
-.shopItem p {
-  color: #d4e3f4;
-}
-#overlay {
-  backdrop-filter: blur(8px);
-}
-footer {
-  max-width: 960px;
-  border-top: 1px solid rgba(197,222,255,.12);
-  padding-top: 1!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -648,6 +380,7 @@ window.addEventListener("error",function(e){
 });
 const W=960,H=540,GROUND=435,LEVEL_LENGTH=2600;
 let state="menu",level=1,lives=3,coins=Number(localStorage.getItem("tuanziCoins")||0);
+const MAX_FUEL=900;
 let scroll=0,fuel=0,cheated=localStorage.getItem("tuanziCheated")==="yes";
 let hasOnion=localStorage.getItem("tuanziOnion")==="yes";
 let frame=0,invincible=0,previousState="menu",lastTime=0;
@@ -793,7 +526,7 @@ function makeLevel(){
 function startGame(){
   level=1;
   lives=3;
-  fuel=0;
+  fuel=cheated?MAX_FUEL:0;
   hasOnion=localStorage.getItem("tuanziOnion")==="yes";
   state="play";
   makeLevel();
@@ -803,12 +536,23 @@ function startGame(){
 function startNext(){
   if(level<5){
     level++;
+    lives=3;
+    if(cheated)fuel=MAX_FUEL;
     state="play";
     makeLevel();
     closePanel();
     say("进入第"+level+"关！");
   }
   else finishGame(true);
+}
+function restartCurrentLevel(){
+  lives=3;
+  if(cheated)fuel=MAX_FUEL;
+  state="play";
+  makeLevel();
+  invincible=150;
+  closePanel();
+  say("💪 本关生命已恢复！正在重新挑战第"+level+"关。");
 }
 function finishGame(win){
   state=win?"win":"lose";
@@ -830,7 +574,9 @@ function hit(){
   if(lives<=0){
     lives=0;
     updateUI();
-    finishGame(false);
+    say("本关三条生命用完，正在重新开始第"+level+"关……");
+    restartCurrentLevel();
+    return;
   }
   else{
     say("受到攻击！还剩 "+lives+" 条生命");
@@ -843,13 +589,13 @@ function redeem(){
     return;
   }
   const v=document.getElementById("code").value.trim().toLowerCase();
-  if(v==="67mj"&&!cheated){
-    fuel=900;
+  if(v==="67mj"){
+    const firstUnlock=!cheated;
     cheated=true;
+    fuel=MAX_FUEL;
     saveData();
-    say("🚀 火箭背包已解锁！长按跳跃键平稳飞行！");
+    say(firstUnlock?"🚀 火箭背包已解锁！燃料用完后落地会自动补充，可以反复飞行！":"🚀 火箭背包已补满燃料！可以继续飞行！");
   }
-  else if(v==="67mj")say("火箭背包已经兑换过了！");
   else say("作弊码不正确！");
   document.getElementById("code").value="";
   updateUI();
@@ -990,6 +736,10 @@ function update(dt){
     player.y=landing-player.h;
     player.vy=0;
     player.onGround=true;
+  }
+  // 火箭背包可重复使用：落地后自动缓慢充能
+  if(cheated&&player.onGround){
+    fuel=Math.min(MAX_FUEL,fuel+2.4*dt*60);
   }
   scroll=Math.max(level===4?-500:0,Math.min(LEVEL_LENGTH-W,player.x-270));
   // 陷阱
