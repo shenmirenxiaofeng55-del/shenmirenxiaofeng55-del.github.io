@@ -1,207 +1,638 @@
-
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>🍡 团子冒险世界</title>
 <style>
-*{box-sizing:border-box}
-body{
- margin:0;padding:12px;text-align:center;
- background:#11172b;color:white;
- font-family:Arial,system-ui,sans-serif;
+*{
+  box-sizing:border-box
 }
-h1{color:#a9f0d0}
+:root{
+  --mint:#a9f0d0;
+  --deep:#11172b;
+  --panel:#26344f
+}
+body{
+  margin:0;
+  padding:12px;
+  text-align:center;
+  background:var(--deep);
+  color:white;
+  font-family:Arial,system-ui,sans-serif
+}
+h1{
+  color:var(--mint);
+  margin:8px
+}
 .info{
- display:flex;justify-content:center;
- flex-wrap:wrap;gap:8px;margin:12px;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px
 }
 .info span{
- background:#27334e;padding:9px 12px;
- border-radius:12px;font-weight:bold;
+  background:#27334e;
+  padding:9px 12px;
+  border-radius:12px;
+  font-weight:bold
 }
 canvas{
- display:block;width:100%;max-width:960px;
- margin:auto;border:3px solid white;
- border-radius:15px;background:#9be7f5;
- touch-action:none;
+  display:block;
+  width:100%;
+  max-width:960px;
+  height:auto;
+  margin:auto;
+  border:3px solid white;
+  border-radius:15px;
+  background:#9be7f5;
+  touch-action:none
 }
 button{
- border:0;border-radius:11px;
- padding:12px 16px;margin:5px;
- font-weight:bold;font-size:15px;
- background:#a9f0d0;color:#17352c;
- cursor:pointer;
+  border:0;
+  border-radius:11px;
+  padding:12px 16px;
+  margin:5px;
+  font-weight:bold;
+  font-size:15px;
+  background:var(--mint);
+  color:#17352c;
+  cursor:pointer;
+  touch-action:manipulation
 }
-button:active{transform:scale(.96)}
+button:active{
+  transform:scale(.96)
+}
+button:disabled{
+  opacity:.55
+}
 #overlay{
- position:fixed;inset:0;z-index:20;
- display:flex;align-items:center;
- justify-content:center;padding:15px;
- background:#10172bee;
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  background:#10172bee
 }
 .panel{
- width:min(470px,100%);
- max-height:90vh;overflow:auto;
- background:#26344f;
- border:2px solid #9ee8cf;
- border-radius:22px;padding:22px;
- box-shadow:0 15px 50px #0008;
+  width:min(470px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--panel);
+  border:2px solid #9ee8cf;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 15px 50px #0008
 }
-.panel h2{color:#a9f0d0}
-.panel p{line-height:1.7}
-.hidden{display:none!important}
-.big{font-size:65px}
-#msg{color:#ffe49b;min-height:24px}
+.panel h2{
+  color:var(--mint)
+}
+.panel p{
+  line-height:1.7
+}
+.hidden{
+  display:none!important
+}
+.big{
+  font-size:65px
+}
+#msg{
+  color:#ffe49b;
+  min-height:24px
+}
 .controls{
- display:flex;justify-content:center;
- align-items:center;gap:10px;
- margin:12px auto;max-width:500px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:12px auto;
+  max-width:500px
 }
 .controls button{
- width:85px;height:65px;
- font-size:25px;
- touch-action:none;
- user-select:none;
+  width:85px;
+  height:65px;
+  font-size:25px;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none
 }
-#jump{background:#ffd166}
+#jump{
+  background:#ffd166
+}
+#attack{
+  background:#ffb3a7
+}
 #shopItems{
- display:grid;grid-template-columns:1fr 1fr;
- gap:9px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
 }
 .shopItem{
- background:#344461;padding:12px;
- border-radius:12px;
+  background:#344461;
+  padding:12px;
+  border-radius:12px
 }
-.shopItem button{font-size:13px}
+.shopItem button{
+  font-size:13px
+}
 footer{
- margin:25px auto;color:#aebbd0;
- font-size:12px;line-height:1.8;
+  margin:25px auto;
+  color:#aebbd0;
+  font-size:12px;
+  line-height:1.8
 }
-.small{font-size:12px;color:#b9c6db}
+.small{
+  font-size:12px;
+  color:#b9c6db
+}
+input{
+  width:130px;
+  padding:11px;
+  border-radius:10px;
+  border:1px solid #9ee8cf;
+  background:#17243b;
+  color:white
+}
+@media(max-width:520px){
+  body{
+    padding:7px
+  }
+  .controls button{
+    width:76px;
+    height:62px
+  }
+  .panel{
+    padding:17px
+  }
+}
+/* ===== 精致界面增强 ===== */
+:root {
+  --mint: #a9f0d0;
+  --mint-bright: #c8ffe8;
+  --gold: #ffd166;
+  --coral: #ff9e9e;
+  --deep: #10182c;
+  --panel: #263650;
+}
+body {
+  min-height: 100vh;
+  background:
+  radial-gradient(circle at 12% 8%, rgba(95, 190, 169, .16), transparent 28%),
+  radial-gradient(circle at 88% 18%, rgba(109, 145, 220, .15), transparent 30%),
+  linear-gradient(145deg, #10182c, #17243b 55%, #10182c);
+}
+h1 {
+  text-shadow: 0 3px 18px rgba(119, 255, 211, .22);
+  letter-spacing: 1px;
+}
+.info span {
+  border: 1px solid rgba(184, 255, 225, .16);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .16);
+  backdrop-filter: blur(8px);
+}
+canvas {
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .34), 0 0 0 1px rgba(205,255,236,.16);
+}
+button {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .16), 0 8px 20px rgba(0,0,0,.12);
+  transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+}
+button:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+button:active {
+  transform: translateY(2px) scale(.98);
+  box-shadow: 0 2px 0 rgba(0,0,0,.16);
+}
+button:focus-visible, input:focus-visible {
+  outline: 3px solid #fff0a8;
+  outline-offset: 3px;
+}
+#left, #right {
+  background: linear-gradient(180deg, #b8f4dc, #7dd9b7);
+}
+#jump {
+  background: linear-gradient(180deg, #ffe59b, #ffc64e);
+}
+#attack {
+  background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
+}
+#msg {
+  padding: 8px 12px;
+  margin: 7px auto;
+  width: min(960px, 96%);
+  border: 1px solid rgba(255, 226, 154, .15);
+  border-radius: 12px;
+  background: rgba(31, 45, 68, .55);
+}
+.panel {
+  background:
+  radial-gradient(circle at 100% 0%, rgba(169,240,208,.12), transparent 35%),
+  linear-gradient(145deg, #2b3c59, #202d46);
+  border: 1px solid rgba(195,255,231,.55);
+  box-shadow: 0 25px 80px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.08);
+  animation: panelIn .22s ease-out;
+}
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.panel h2 {
+  text-shadow: 0 2px 14px rgba(169,240,208,.16);
+}
+.shopItem {
+  border: 1px solid rgba(196,255,230,.12);
+  background: linear-gradient(145deg, #3b506f, #2c3e5b);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.shopItem p {
+  color: #d4e3f4;
+}
+#overlay {
+  backdrop-filter: blur(8px);
+}
+footer {
+  max-width: 960px;
+  border-top: 1px solid rgba(197,222,255,.12);
+  padding-top: 1!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🍡 团子冒险世界</title>
+<style>
+*{
+  box-sizing:border-box
+}
+:root{
+  --mint:#a9f0d0;
+  --deep:#11172b;
+  --panel:#26344f
+}
+body{
+  margin:0;
+  padding:12px;
+  text-align:center;
+  background:var(--deep);
+  color:white;
+  font-family:Arial,system-ui,sans-serif
+}
+h1{
+  color:var(--mint);
+  margin:8px
+}
+.info{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px
+}
+.info span{
+  background:#27334e;
+  padding:9px 12px;
+  border-radius:12px;
+  font-weight:bold
+}
+canvas{
+  display:block;
+  width:100%;
+  max-width:960px;
+  height:auto;
+  margin:auto;
+  border:3px solid white;
+  border-radius:15px;
+  background:#9be7f5;
+  touch-action:none
+}
+button{
+  border:0;
+  border-radius:11px;
+  padding:12px 16px;
+  margin:5px;
+  font-weight:bold;
+  font-size:15px;
+  background:var(--mint);
+  color:#17352c;
+  cursor:pointer;
+  touch-action:manipulation
+}
+button:active{
+  transform:scale(.96)
+}
+button:disabled{
+  opacity:.55
+}
+#overlay{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  background:#10172bee
+}
+.panel{
+  width:min(470px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--panel);
+  border:2px solid #9ee8cf;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 15px 50px #0008
+}
+.panel h2{
+  color:var(--mint)
+}
+.panel p{
+  line-height:1.7
+}
+.hidden{
+  display:none!important
+}
+.big{
+  font-size:65px
+}
+#msg{
+  color:#ffe49b;
+  min-height:24px
+}
+.controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:12px auto;
+  max-width:500px
+}
+.controls button{
+  width:85px;
+  height:65px;
+  font-size:25px;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none
+}
+#jump{
+  background:#ffd166
+}
+#attack{
+  background:#ffb3a7
+}
+#shopItems{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
+}
+.shopItem{
+  background:#344461;
+  padding:12px;
+  border-radius:12px
+}
+.shopItem button{
+  font-size:13px
+}
+footer{
+  margin:25px auto;
+  color:#aebbd0;
+  font-size:12px;
+  line-height:1.8
+}
+.small{
+  font-size:12px;
+  color:#b9c6db
+}
+input{
+  width:130px;
+  padding:11px;
+  border-radius:10px;
+  border:1px solid #9ee8cf;
+  background:#17243b;
+  color:white
+}
+@media(max-width:520px){
+  body{
+    padding:7px
+  }
+  .controls button{
+    width:76px;
+    height:62px
+  }
+  .panel{
+    padding:17px
+  }
+}
+/* ===== 精致界面增强 ===== */
+:root {
+  --mint: #a9f0d0;
+  --mint-bright: #c8ffe8;
+  --gold: #ffd166;
+  --coral: #ff9e9e;
+  --deep: #10182c;
+  --panel: #263650;
+}
+body {
+  min-height: 100vh;
+  background:
+  radial-gradient(circle at 12% 8%, rgba(95, 190, 169, .16), transparent 28%),
+  radial-gradient(circle at 88% 18%, rgba(109, 145, 220, .15), transparent 30%),
+  linear-gradient(145deg, #10182c, #17243b 55%, #10182c);
+}
+h1 {
+  text-shadow: 0 3px 18px rgba(119, 255, 211, .22);
+  letter-spacing: 1px;
+}
+.info span {
+  border: 1px solid rgba(184, 255, 225, .16);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .16);
+  backdrop-filter: blur(8px);
+}
+canvas {
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .34), 0 0 0 1px rgba(205,255,236,.16);
+}
+button {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .16), 0 8px 20px rgba(0,0,0,.12);
+  transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+}
+button:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+button:active {
+  transform: translateY(2px) scale(.98);
+  box-shadow: 0 2px 0 rgba(0,0,0,.16);
+}
+button:focus-visible, input:focus-visible {
+  outline: 3px solid #fff0a8;
+  outline-offset: 3px;
+}
+#left, #right {
+  background: linear-gradient(180deg, #b8f4dc, #7dd9b7);
+}
+#jump {
+  background: linear-gradient(180deg, #ffe59b, #ffc64e);
+}
+#attack {
+  background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
+}
+#msg {
+  padding: 8px 12px;
+  margin: 7px auto;
+  width: min(960px, 96%);
+  border: 1px solid rgba(255, 226, 154, .15);
+  border-radius: 12px;
+  background: rgba(31, 45, 68, .55);
+}
+.panel {
+  background:
+  radial-gradient(circle at 100% 0%, rgba(169,240,208,.12), transparent 35%),
+  linear-gradient(145deg, #2b3c59, #202d46);
+  border: 1px solid rgba(195,255,231,.55);
+  box-shadow: 0 25px 80px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.08);
+  animation: panelIn .22s ease-out;
+}
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.panel h2 {
+  text-shadow: 0 2px 14px rgba(169,240,208,.16);
+}
+.shopItem {
+  border: 1px solid rgba(196,255,230,.12);
+  background: linear-gradient(145deg, #3b506f, #2c3e5b);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.shopItem p {
+  color: #d4e3f4;
+}
+#overlay {
+  backdrop-filter: blur(8px);
+}
+footer {
+  max-width: 960px;
+  border-top: 1px solid rgba(197,222,255,.12);
+  padding-top: 14px;
+}
+@media (max-width: 520px) {
+  .info {
+    gap: 5px;
+  }
+  .info span {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+  .controls {
+    gap: 5px;
+  }
+  .controls button {
+    width: 68px;
+    height: 60px;
+    margin: 3px;
+  }
+  .panel {
+    border-radius: 18px;
+  }
+}
 </style>
 </head>
 <body>
-
 <h1>🍡 团子冒险世界</h1>
-
 <div class="info">
  <span>❤️ 生命：<b id="lives">3</b></span>
  <span>🪙 金币：<b id="coins">0</b></span>
  <span>🚀 火箭：<b id="fuel">无</b></span>
- <span>🗺️ 关卡：<b id="level">1</b>/3</span>
+ <span>🗺️ 关卡：<b id="level">1</b>/5</span>
+ <span id="weaponInfo">🥢 武器：无</span>
 </div>
-
+<!-- 主游戏画布：固定逻辑分辨率，CSS 自适应手机屏幕 -->
 <canvas id="game" width="960" height="540"></canvas>
-
 <div class="controls">
- <button id="left">⬅️</button>
- <button id="jump">⬆️</button>
- <button id="right">➡️</button>
+ <button id="left">⬅️</button><button id="jump">⬆️</button><button id="right">➡️</button>
+ <button id="attack">⚔️</button>
 </div>
-
 <div>
  <button id="restart">重新开始本关</button>
  <button id="shopButton">👕 团子商店</button>
  <button id="rulesButton">游戏规则</button>
 </div>
-
 <div>
  <input id="code" maxlength="4" placeholder="输入作弊码">
  <button id="redeem">兑换火箭</button>
 </div>
-
 <p id="msg">准备好开始冒险了吗？</p>
 
 <div id="overlay">
-
  <div class="panel" id="welcome">
-  <div class="big">🍡</div>
-  <h2>团子冒险世界</h2>
-  <p>欢迎来到团子的冒险世界！</p>
-  <p>自由移动、躲避陷阱、收集金币、挑战章鱼！</p>
-  <button id="startAdventure">开始冒险</button>
+  <div class="big">🍡</div><h2>团子冒险世界</h2>
+  <p>欢迎来到团子的五关冒险世界！</p>
+  <p>自由移动、躲避陷阱、收集金币、挑战章鱼和邪恶团子！</p>
+  <button id="startAdventure">开始游戏</button>
+  <button id="welcomeTutorial">新手教程</button>
   <button id="welcomeShop">团子商店</button>
-  <p class="small">原创角色 · 三大关卡 · 冒险游戏</p>
+  <button id="welcomeDisclaimer">免责声明</button>
+  <p class="small">原创角色 · 五大关卡 · 冒险游戏</p>
  </div>
-
  <div class="panel hidden" id="tutorial">
   <h2>📖 新手教程</h2>
-  <p>⬅️ 左移：向左移动</p>
-  <p>➡️ 右移：向右移动</p>
-  <p>⬆️ 跳跃：跳过尖刺和陷阱</p>
-  <p>🪙 金币：收集金币，可以购买装扮</p>
-  <p>🐙 章鱼：碰到章鱼或墨汁会失去一条命</p>
-  <p>🚀 作弊码：67mj，获得火箭背包</p>
+  <p>⬅️➡️ 左右移动，⬆️ 跳跃。长按跳跃键使用火箭背包（解锁后）。</p>
+  <p>🪙 金币放在地面附近，走过去即可收集，不需要跳得很高。</p>
+  <p>🐙 章鱼会移动并喷墨。第四关推箱子压住传感器，第五关挑战 Boss。</p>
+  <p>🚀 作弊码：67mj，获得火箭背包。</p>
   <button id="tutorialStart">开始第一关</button>
  </div>
-
  <div class="panel hidden" id="shopPanel">
-  <h2>👕 团子商店</h2>
-  <p>当前金币：<b id="shopCoins">0</b> 🪙</p>
-  <div id="shopItems"></div>
-  <button id="shopBack">返回</button>
+  <h2>👕 团子商店</h2><p>当前金币：<b id="shopCoins">0</b> 🪙</p>
+  <div id="shopItems"></div><button id="shopBack">返回</button>
  </div>
-
  <div class="panel hidden" id="rulesPanel">
   <h2>📖 游戏规则</h2>
-  <p>
-   ❤️ 一共有三条生命<br>
-   ⬅️➡️ 自由移动<br>
-   ⬆️ 跳跃躲避陷阱<br>
-   🐙 章鱼会移动并喷墨<br>
-   🪙 收集金币购买装扮<br>
-   🗺️ 一共三个关卡<br>
-   🚀 作弊码：67mj
-  </p>
+  <p>❤️ 三条生命；⬅️➡️ 自由移动；⬆️ 跳跃和飞行；🐙 章鱼会移动并喷墨；🪙 收集金币购买装扮；第四关推箱子解谜；第五关挑战邪恶团子。</p>
   <button id="rulesBack">返回</button>
  </div>
-
  <div class="panel hidden" id="stagePanel">
-  <div class="big">🎉</div>
-  <h2 id="stageTitle">第一关完成！</h2>
-  <p id="stageText">准备进入下一关！</p>
+  <div class="big">🎉</div><h2 id="stageTitle">关卡完成！</h2><p id="stageText"></p>
   <button id="nextStage">继续冒险</button>
  </div>
-
  <div class="panel hidden" id="ending">
-  <div class="big" id="endIcon">🏆</div>
-  <h2 id="endTitle">游戏结束</h2>
-  <p id="endText"></p>
-  <button id="endingRestart">重新挑战</button>
-  <button id="endingShop">团子商店</button>
+  <div class="big" id="endIcon">🏆</div><h2 id="endTitle">游戏结束</h2><p id="endText"></p>
+  <button id="endingRestart">重新挑战</button><button id="endingShop">团子商店</button>
+  <button id="endingHome">返回主页</button>
  </div>
-
  <div class="panel hidden" id="disclaimer">
   <h2>📜 免责声明</h2>
-  <p>
-   本网站为个人非经营性静态演示项目，
-   主要用于个人学习、技术交流和娱乐体验。
-  </p>
-  <p>
-   本项目不提供付费游戏功能，
-   不主动要求玩家提交个人身份信息。
-  </p>
-  <p>
-   游戏中的原创代码和自行绘制图形，
-   其相关权利归各自合法权利人所有。
-   第三方素材如有使用，将遵守相应授权。
-  </p>
-  <p>
-   网站托管服务可能按照其自身政策处理
-   访问日志等技术数据。
-  </p>
-  <p>
-   游戏仅供娱乐。因网络、设备或浏览器
-   兼容性造成的异常，请以实际运行情况为准。
-  </p>
+  <p>本网站为个人非经营性静态演示项目，主要用于个人学习、技术交流和娱乐体验。</p>
+  <p>本项目不提供付费游戏功能，不主动要求玩家提交个人身份信息。</p>
+  <p>游戏中的原创代码和自行绘制图形，其相关权利归各自合法权利人所有。第三方素材如有使用，将遵守相应授权。</p>
+  <p>网站托管服务可能按照其自身政策处理访问日志等技术数据。</p>
+  <p>游戏仅供娱乐。因网络、设备或浏览器兼容性造成的异常，请以实际运行情况为准。</p>
   <p class="small">最后更新时间：2026年11月19日</p>
   <button id="disclaimerBack">关闭</button>
  </div>
-
 </div>
-
+<!-- 页脚免责声明文字保留原样；不加载外部字体、图片或第三方脚本。 -->
 <footer>
  <p>本网站为个人非经营性静态演示项目</p>
  <p>不提供付费功能，不主动收集玩家个人信息</p>
@@ -211,828 +642,862 @@ footer{
 
 <script>
 "use strict";
-
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-const W=960,H=540,ground=435;
-const LEVEL_LENGTH=2600;
-
-let player;
-let level=1;
-let lives=3;
-let coins=Number(localStorage.getItem("tuanziCoins")||0);
-let scroll=0;
-let fuel=0;
-let cheated=false;
-let state="menu";
-let frame=0;
-let invincible=0;
-let holding={left:false,right:false,jump:false};
-let obstacles=[];
-let gold=[];
-let octopus=[];
-let ink=[];
-let levelSeed=0;
-let previousState="menu";
-
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+window.addEventListener("error",function(e){
+  const m=document.getElementById("msg");if(m)m.textContent="游戏脚本出现异常，请刷新页面；错误："+(e.message||"未知错误");
+});
+const W=960,H=540,GROUND=435,LEVEL_LENGTH=2600;
+let state="menu",level=1,lives=3,coins=Number(localStorage.getItem("tuanziCoins")||0);
+let scroll=0,fuel=0,cheated=localStorage.getItem("tuanziCheated")==="yes";
+let hasOnion=localStorage.getItem("tuanziOnion")==="yes";
+let frame=0,invincible=0,previousState="menu",lastTime=0;
+let holding={
+  left:false,right:false,jump:false
+}
+;
+let player={
+  x:100,y:GROUND-55,w:55,h:55,vx:0,vy:0,onGround:true,facing:1
+}
+;
+let obstacles=[],gold=[],octopus=[],ink=[],platforms=[];
+let crate={
+  x:450,y:GROUND-54,w:54,h:54
+}
+,sensor={
+  x:1180,w:92
+}
+;
+let doorOpen=false,chestOpened=localStorage.getItem("tuanziChestOpened")==="yes";
+let boss={
+  x:2100,y:GROUND-75,hp:100,maxHp:100,attackTimer:1.4,flash:0
+}
+;
+let bossProjectiles=[],attackCooldown=0,toastFrames=0;
 const cosmetics=[
- {id:"normal",name:"原始团子",price:0,emoji:"🍡",color:"#83e0bd"},
- {id:"crown",name:"皇冠团子",price:15,emoji:"👑",color:"#83e0bd"},
- {id:"glasses",name:"眼镜团子",price:20,emoji:"🕶️",color:"#83e0bd"},
- {id:"flower",name:"花朵团子",price:25,emoji:"🌸",color:"#83e0bd"},
- {id:"gold",name:"黄金团子",price:40,emoji:"✨",color:"#f5c84c"}
+{
+  id:"normal",name:"原始团子",price:0,emoji:"🍡"
+}
+,
+{
+  id:"crown",name:"皇冠团子",price:15,emoji:"👑"
+}
+,
+{
+  id:"glasses",name:"眼镜团子",price:20,emoji:"🕶️"
+}
+,
+{
+  id:"flower",name:"花朵团子",price:25,emoji:"🌸"
+}
+,
+{
+  id:"gold",name:"黄金团子",price:40,emoji:"✨"
+}
 ];
-
 let owned=JSON.parse(localStorage.getItem("tuanziOwned")||'["normal"]');
 let equipped=localStorage.getItem("tuanziEquipped")||"normal";
-
 function saveData(){
- localStorage.setItem("tuanziCoins",coins);
- localStorage.setItem("tuanziOwned",JSON.stringify(owned));
- localStorage.setItem("tuanziEquipped",equipped);
+  localStorage.setItem("tuanziCoins",coins);
+  localStorage.setItem("tuanziOwned",JSON.stringify(owned));
+  localStorage.setItem("tuanziEquipped",equipped);
+  localStorage.setItem("tuanziOnion",hasOnion?"yes":"no");
+  localStorage.setItem("tuanziChestOpened",chestOpened?"yes":"no");
+  localStorage.setItem("tuanziCheated",cheated?"yes":"no");
 }
-
+function say(t){
+  document.getElementById("msg").textContent=t;
+}
 function showPanel(id){
- document.querySelectorAll(".panel").forEach(p=>p.classList.add("hidden"));
- document.getElementById("overlay").classList.remove("hidden");
- document.getElementById(id).classList.remove("hidden");
+  document.querySelectorAll(".panel").forEach(p=>p.classList.add("hidden"));
+  document.getElementById("overlay").classList.remove("hidden");
+  document.getElementById(id).classList.remove("hidden");
 }
-
 function closePanel(){
- document.getElementById("overlay").classList.add("hidden");
+  document.getElementById("overlay").classList.add("hidden");
 }
-
 function updateUI(){
- document.getElementById("lives").textContent=lives;
- document.getElementById("coins").textContent=coins;
- document.getElementById("fuel").textContent=fuel>0?Math.ceil(fuel/60)+"秒":"无";
- document.getElementById("level").textContent=level;
- document.getElementById("shopCoins").textContent=coins;
+  document.getElementById("lives").textContent=lives;
+  document.getElementById("coins").textContent=coins;
+  document.getElementById("fuel").textContent=fuel>0?Math.ceil(fuel/60)+"秒":"无";
+  document.getElementById("level").textContent=level;
+  document.getElementById("shopCoins").textContent=coins;
+  document.getElementById("weaponInfo").textContent=hasOnion?"🥢 武器：传奇大葱":"🥢 武器：无";
 }
-
 function makeLevel(){
- obstacles=[];
- gold=[];
- octopus=[];
- ink=[];
- scroll=0;
-
- let x=420;
-
- while(x<LEVEL_LENGTH-180){
-  obstacles.push({
-   x:x,
-   w:level===3?85:55,
-   h:level===2?65:50,
-   moving:level>=2,
-   phase:Math.random()*6.28,
-   type:Math.random()<.5?"spike":"block"
-  });
-
-  x+=level===1?390:level===2?320:270;
- }
-
- // 金币
- for(let i=0;i<24;i++){
-  let x=300+i*95+Math.random()*30;
-  gold.push({
-   x:x,
-   y:260+(i%3)*-35,
-   got:false
-  });
- }
-
- // 章鱼
- let count=level===1?2:level===2?3:4;
-
- for(let i=0;i<count;i++){
-  octopus.push({
-   x:650+i*(LEVEL_LENGTH-900)/count,
-   baseY:330,
-   phase:Math.random()*6.28,
-   direction:1,
-   cooldown:100+Math.random()*100
-  });
- }
-}
-
-function startGame(){
- level=1;
- lives=3;
- fuel=0;
- cheated=false;
- startLevel();
-}
-
-function startLevel(){
- makeLevel();
-
- player={
-  x:100,
-  y:ground-55,
-  w:55,
-  h:55,
-  vx:0,
-  vy:0
- };
-
- invincible=0;
- holding={left:false,right:false,jump:false};
- state="play";
- closePanel();
- updateUI();
-
- document.getElementById("msg").textContent=
- "第"+level+"关：开始冒险！小心章鱼和陷阱！";
-}
-
-function nextLevel(){
- if(level<3){
-  level++;
-  startLevel();
- }else{
-  finishGame(true);
- }
-}
-
-function restartLevel(){
- if(state==="menu")return;
- lives=3;
- fuel=0;
- startLevel();
-}
-
-function jump(){
- if(state!=="play")return;
-
- if(player.y+player.h>=ground-1){
-  player.vy=-15;
- }
-}
-
-function hit(){
- if(invincible>0||state!=="play")return;
-
- lives--;
- invincible=100;
- player.vy=-5;
-
- if(lives<=0){
-  lives=0;
-  finishGame(false);
- }else{
-  document.getElementById("msg").textContent=
-  "💥 被攻击了！还剩"+lives+"条命！";
- }
-
- updateUI();
-}
-
-function finishGame(win){
- state=win?"win":"lose";
- holding={left:false,right:false,jump:false};
-
- document.getElementById("endIcon").textContent=win?"🏆":"💔";
- document.getElementById("endTitle").textContent=
-  win?"恭喜通关三大关！":"游戏失败！";
-
- document.getElementById("endText").textContent=
-  win?"团子成功征服了三个关卡！你真厉害！":
-  "生命已经用完，再挑战一次吧！";
-
- showPanel("ending");
-}
-
-function redeem(){
- if(state!=="play"){
-  document.getElementById("msg").textContent="请先开始游戏！";
-  return;
- }
-
- let value=document.getElementById("code").value.trim().toLowerCase();
-
- if(value==="67mj"&&!cheated){
-  fuel=720;
-  cheated=true;
-  document.getElementById("msg").textContent=
-   "🚀 火箭背包已获得！按住跳跃键飞行！";
- }else if(value==="67mj"){
-  document.getElementById("msg").textContent="已经兑换过火箭了！";
- }else{
-  document.getElementById("msg").textContent="作弊码错误！";
- }
-
- document.getElementById("code").value="";
- updateUI();
-}
-
-// 商店
-function openShop(){
- previousState=state;
- if(state==="play")state="paused";
-
- renderShop();
- showPanel("shopPanel");
-}
-
-function renderShop(){
- updateUI();
-
- const box=document.getElementById("shopItems");
- box.innerHTML="";
-
- cosmetics.forEach(item=>{
-  let isOwned=owned.includes(item.id);
-  let isEquipped=equipped===item.id;
-
-  let div=document.createElement("div");
-  div.className="shopItem";
-
-  let name=document.createElement("b");
-  name.textContent=item.emoji+" "+item.name;
-
-  let price=document.createElement("p");
-  price.textContent=item.price===0?"免费":"价格："+item.price+" 金币";
-
-  let button=document.createElement("button");
-
-  if(isEquipped){
-   button.textContent="已装备";
-   button.disabled=true;
-  }else if(isOwned){
-   button.textContent="装备";
-   button.onclick=()=>equip(item.id);
-  }else{
-   button.textContent="购买";
-   button.onclick=()=>buy(item);
+  obstacles=[];
+  gold=[];
+  octopus=[];
+  ink=[];
+  platforms=[];
+  bossProjectiles=[];
+  scroll=0;
+  doorOpen=false;
+  if(level<=3){
+    let x=420;
+    while(x<LEVEL_LENGTH-180){
+      obstacles.push({
+        x,w:level===3?85:55,h:level===2?65:50,moving:level>=2,phase:Math.random()*6.28,type:Math.random()<.5?"spike":"block"
+      });
+      x+=level===1?390:level===2?320:270;
+    }
+    for(let i=0;i<24;i++){
+      const x=300+i*95+Math.random()*25;
+      // 金币降低到地面上方约 45 像素，站立或轻微跳跃即可收集
+      gold.push({
+        x,y:GROUND-48-(i%2)*8,got:false
+      });
+    }
+    const count=level===1?2:level===2?3:4;
+    for(let i=0;i<count;i++)octopus.push({
+      x:650+i*(LEVEL_LENGTH-900)/count,baseY:330,phase:Math.random()*6.28,cooldown:110+Math.random()*90
+    });
+    for(let i=0;i<5;i++)platforms.push({
+      x:760+i*340,y:GROUND-100-(i%2)*28,w:125,h:16
+    });
   }
-
-  div.append(name,price,button);
-  box.appendChild(div);
- });
+  if(level===4){
+    // 第四关：谜题场景，彩蛋宝箱在出生点后方
+    crate={
+      x:480,y:GROUND-54,w:54,h:54
+    }
+    ;
+    sensor={
+      x:1180,w:92
+    }
+    ;
+    for(let i=0;i<13;i++)gold.push({
+      x:220+i*115,y:GROUND-48,got:false
+    });
+    obstacles=[{
+      x:850,w:50,h:42,type:"spike",moving:false,phase:0
+    }
+    ];
+  }
+  if(level===5){
+    boss={
+      x:2100,y:GROUND-75,hp:100,maxHp:100,attackTimer:1.3,flash:0
+    }
+    ;
+    for(let i=0;i<10;i++)gold.push({
+      x:250+i*105,y:GROUND-48,got:false
+    });
+  }
+  player={
+    x:100,y:GROUND-55,w:55,h:55,vx:0,vy:0,onGround:true,facing:1
+  }
+  ;
+  invincible=0;
+  attackCooldown=0;
+  updateUI();
 }
-
-function buy(item){
- if(coins<item.price){
-  document.getElementById("msg").textContent="金币不够哦！继续闯关收集吧！";
-  return;
- }
-
- coins-=item.price;
- owned.push(item.id);
- equipped=item.id;
- saveData();
- renderShop();
- document.getElementById("msg").textContent="购买成功！新装扮已装备！";
-}
-
-function equip(id){
- if(!owned.includes(id))return;
- equipped=id;
- saveData();
- renderShop();
-}
-
-function closeShop(){
- if(previousState==="play"){
+function startGame(){
+  level=1;
+  lives=3;
+  fuel=0;
+  hasOnion=localStorage.getItem("tuanziOnion")==="yes";
   state="play";
+  makeLevel();
   closePanel();
- }else if(previousState==="paused"){
-  state="paused";
-  showPanel("welcome");
- }else{
-  state=previousState;
-  closePanel();
- }
+  say("第一关开始！金币就在地面附近，走过去收集吧！");
 }
-
-// 绘制团子
-function drawPlayer(){
- let x=player.x-scroll;
- let y=player.y;
- let bob=Math.sin(frame*.2)*2;
-
- ctx.save();
- ctx.translate(x+27,y+28+bob);
-
- // 火箭
- if(fuel>0){
-  ctx.fillStyle="#637d91";
-  ctx.fillRect(-34,-10,12,32);
-  ctx.fillStyle="#ff9b35";
-  ctx.beginPath();
-  ctx.moveTo(-33,21);
-  ctx.lineTo(-27,42+Math.random()*5);
-  ctx.lineTo(-21,21);
-  ctx.fill();
- }
-
- // 触角
- ctx.strokeStyle="#65cba8";
- ctx.lineWidth=11;
- ctx.lineCap="round";
-
- ctx.beginPath();
- ctx.moveTo(-12,-19);
- ctx.quadraticCurveTo(-45,-50,-48,-72);
- ctx.moveTo(12,-19);
- ctx.quadraticCurveTo(45,-50,48,-72);
- ctx.stroke();
-
- ctx.fillStyle="#a5f2d7";
- ctx.beginPath();
- ctx.arc(-48,-72,10,0,Math.PI*2);
- ctx.arc(48,-72,10,0,Math.PI*2);
- ctx.fill();
-
- // 身体
- let item=cosmetics.find(c=>c.id===equipped);
- ctx.fillStyle=item&&equipped==="gold"?"#f5c84c":"#83e0bd";
- ctx.strokeStyle="#389c80";
- ctx.lineWidth=3;
- ctx.beginPath();
- ctx.ellipse(0,0,27,29,0,0,Math.PI*2);
- ctx.fill();
- ctx.stroke();
-
- // 手脚
- ctx.fillStyle=ctx.fillStyle;
- ctx.beginPath();
- ctx.ellipse(-30,8,8,12,-.5,0,Math.PI*2);
- ctx.ellipse(30,8,8,12,.5,0,Math.PI*2);
- ctx.fill();
-
- ctx.fillStyle="#389c80";
- ctx.beginPath();
- ctx.ellipse(-13,27,9,6,0,0,Math.PI*2);
- ctx.ellipse(13,27,9,6,0,0,Math.PI*2);
- ctx.fill();
-
- // 眼睛
- ctx.fillStyle="#233b3b";
- ctx.beginPath();
- ctx.arc(-10,-5,4,0,7);
- ctx.arc(10,-5,4,0,7);
- ctx.fill();
-
- // 腮红
- ctx.fillStyle="#ff9eb9";
- ctx.beginPath();
- ctx.ellipse(-19,8,5,3,0,0,7);
- ctx.ellipse(19,8,5,3,0,0,7);
- ctx.fill();
-
- // 装扮
- if(equipped==="crown"){
-  ctx.font="27px Arial";
-  ctx.fillText("👑",-14,-30);
- }
- if(equipped==="glasses"){
-  ctx.font="25px Arial";
-  ctx.fillText("🕶️",-15,5);
- }
- if(equipped==="flower"){
-  ctx.font="25px Arial";
-  ctx.fillText("🌸",-12,-30);
- }
-
- ctx.restore();
+function startNext(){
+  if(level<5){
+    level++;
+    state="play";
+    makeLevel();
+    closePanel();
+    say("进入第"+level+"关！");
+  }
+  else finishGame(true);
 }
-
-// 画章鱼
-function drawOctopus(o){
- let x=o.x-scroll;
- let y=o.baseY+Math.sin(frame*.045+o.phase)*35;
-
- ctx.save();
- ctx.translate(x,y);
-
- ctx.fillStyle="#9a69d9";
- ctx.beginPath();
- ctx.arc(0,0,27,0,Math.PI*2);
- ctx.fill();
-
- ctx.strokeStyle="#9a69d9";
- ctx.lineWidth=9;
- ctx.lineCap="round";
-
- for(let i=0;i<6;i++){
-  let a=i*Math.PI/3;
+function finishGame(win){
+  state=win?"win":"lose";
+  holding={
+    left:false,right:false,jump:false
+  }
+  ;
+  document.getElementById("endIcon").textContent=win?"🏆":"💔";
+  document.getElementById("endTitle").textContent=win?"五关全部通关！":"游戏失败！";
+  document.getElementById("endText").textContent=win?"你打败了邪恶团子，成为团子冒险冠军！":"生命用完了，再挑战一次吧！";
+  showPanel("ending");
+}
+function hit(){
+  if(invincible>0||state!=="play")return;
+  lives--;
+  invincible=95;
+  player.vy=-7;
+  player.vx=-(player.facing||1)*2.5;
+  if(lives<=0){
+    lives=0;
+    updateUI();
+    finishGame(false);
+  }
+  else{
+    say("受到攻击！还剩 "+lives+" 条生命");
+  }
+  updateUI();
+}
+function redeem(){
+  if(state!=="play"){
+    say("请先开始游戏！");
+    return;
+  }
+  const v=document.getElementById("code").value.trim().toLowerCase();
+  if(v==="67mj"&&!cheated){
+    fuel=900;
+    cheated=true;
+    saveData();
+    say("🚀 火箭背包已解锁！长按跳跃键平稳飞行！");
+  }
+  else if(v==="67mj")say("火箭背包已经兑换过了！");
+  else say("作弊码不正确！");
+  document.getElementById("code").value="";
+  updateUI();
+}
+function openShop(){
+  previousState=state;
+  if(state==="play")state="paused";
+  renderShop();
+  showPanel("shopPanel");
+}
+function renderShop(){
+  updateUI();
+  const box=document.getElementById("shopItems");
+  box.innerHTML="";
+  cosmetics.forEach(item=>{
+    const div=document.createElement("div");div.className="shopItem";
+    const title=document.createElement("b");title.textContent=item.emoji+" "+item.name;
+    const price=document.createElement("p");price.textContent=item.price===0?"免费":"价格："+item.price+" 金币";
+    const btn=document.createElement("button");
+    if(equipped===item.id){
+      btn.textContent="已装备";btn.disabled=true;
+    }
+    else if(owned.includes(item.id)){
+      btn.textContent="装备";btn.onclick=()=>{
+        equipped=item.id;saveData();renderShop();
+      };
+    }
+    else{
+      btn.textContent="购买";btn.onclick=()=>{
+        if(coins<item.price){
+          say("金币不够哦！再收集一些吧！");return;
+        }
+        coins-=item.price;owned.push(item.id);equipped=item.id;saveData();renderShop();say("购买成功，已装备新装扮！");
+      };
+    }
+    div.append(title,price,btn);box.appendChild(div);
+  });
+}
+function closeShop(){
+  if(previousState==="play"){
+    state="play";
+    closePanel();
+  }
+  else if(previousState==="paused"){
+    state="paused";
+    showPanel("rulesPanel");
+  }
+  else if(previousState==="ending"){
+    state="win";
+    showPanel("ending");
+  }
+  else{
+    state="menu";
+    showPanel("welcome");
+  }
+}
+function jump(){
+  if(state!=="play")return;
+  if(player.onGround){
+    player.vy=-12.5;
+    player.onGround=false;
+  }
+}
+function attack(){
+  if(state!=="play"||level!==5||attackCooldown>0)return;
+  attackCooldown=24;
+  const distance=Math.abs((player.x+player.w/2)-(boss.x+30));
+  const reach=hasOnion?145:105;
+  if(distance<=reach){
+    const damage=hasOnion?15:5;
+    boss.hp=Math.max(0,boss.hp-damage);
+    boss.flash=12;
+    say(hasOnion?"🥢 传奇大葱命中！Boss -15 HP":"普通攻击命中！Boss -5 HP");
+    if(boss.hp<=0){
+      say("邪恶团子被击败了！走到终点完成关卡！");
+    }
+  }
+  else say("再靠近邪恶团子一点才能打中！");
+}
+function rectHit(a,b){
+  return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+}
+function update(dt){
+  if(state!=="play")return;
+  dt=Math.min(dt,.035);
+  frame+=dt*60;
+  if(invincible>0)invincible-=dt*60;
+  if(attackCooldown>0)attackCooldown-=dt*60;
+  // 平滑加速、松手缓停
+  const dir=(holding.right?1:0)-(holding.left?1:0);
+  const maxSpeed=fuel>0?5.0:4.2;
+  if(dir){
+    player.vx+=dir*(fuel>0?0.48:0.58);
+    player.facing=dir;
+  }
+  else player.vx*=Math.pow(.78,dt*60);
+  player.vx=Math.max(-maxSpeed,Math.min(maxSpeed,player.vx));
+  // 跳跃与火箭背包：推力渐进，松开后自然下落
+  if(holding.jump&&fuel>0){
+    player.vy-=.43*dt*60;
+    player.vy=Math.max(player.vy,-6.2);
+    fuel=Math.max(0,fuel-dt*60);
+  }
+  player.vy+=.42*dt*60;
+  player.vy=Math.min(player.vy,10);
+  const previousX=player.x;
+  player.x+=player.vx*dt*60;
+  player.x=Math.max(level===4?-470:0,Math.min(LEVEL_LENGTH-player.w,player.x));
+  if(level===4){
+    const boxLeft=crate.x;
+    const boxRight=crate.x+crate.w;
+    const nextRight=player.x+player.w;
+    const nextLeft=player.x;
+    const verticalTouch=player.y+player.h>GROUND-crate.h+5;
+    if(verticalTouch && nextRight>boxLeft && nextLeft<boxRight){
+      if(player.vx>0 && previousX+player.w<=boxLeft+4){
+        crate.x+=player.x-previousX;
+        player.x=crate.x-player.w;
+      }
+      else if(player.vx<0 && previousX>=boxRight-4){
+        crate.x+=player.x-previousX;
+        player.x=crate.x+crate.w;
+      }
+      else{
+        player.x=previousX;
+        player.vx=0;
+      }
+    }
+  }
+  const oldBottom=player.y+player.h;
+  player.y+=player.vy*dt*60;
+  player.onGround=false;
+  let landing=GROUND;
+  platforms.forEach(p=>{
+    if(player.x+player.w>p.x&&player.x<p.x+p.w&&oldBottom<=p.y+10&&player.y+player.h>=p.y&&player.vy>=0)landing=Math.min(landing,p.y);
+  });
+  if(player.y+player.h>=landing){
+    player.y=landing-player.h;
+    player.vy=0;
+    player.onGround=true;
+  }
+  scroll=Math.max(level===4?-500:0,Math.min(LEVEL_LENGTH-W,player.x-270));
+  // 陷阱
+  obstacles.forEach(o=>{
+    let y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
+    const bx=o.x-scroll;
+    if(o.type==="spike"){
+      if(player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&player.y+player.h>y+12)hit();
+    }else if(rectHit({
+      x:player.x,y:player.y,w:player.w,h:player.h
+    },{
+      x:o.x,y,w:o.w,h:o.h
+    }))hit();
+  });
+  // 章鱼及墨汁
+  octopus.forEach(o=>{
+    const y=o.baseY+Math.sin(frame*.035+o.phase)*29;
+    o.x+=Math.sin(frame*.012+o.phase)*.8;
+    if(Math.abs(player.x+player.w/2-o.x)<43&&Math.abs(player.y+player.h/2-y)<43)hit();
+    o.cooldown-=dt*60;
+    if(o.cooldown<=0){
+      const dx=player.x+player.w/2-o.x;ink.push({
+        x:o.x,y:y,vx:Math.sign(dx||1)*3.0,vy:Math.max(-1.4,Math.min(1.4,(player.y+25-y)*.012)),r:11
+      });o.cooldown=145+Math.random()*95;
+    }
+  });
+  ink.forEach(b=>{
+    b.x+=b.vx*dt*60;b.y+=b.vy*dt*60;if(Math.abs(player.x+27-b.x)<23&&Math.abs(player.y+27-b.y)<23){
+      hit();b.x=-9999;
+    }
+  });
+  ink=ink.filter(b=>b.x>scroll-100&&b.x<scroll+W+100);
+  // 金币拾取，碰撞范围稍宽松，金币位置低且易拿
+  gold.forEach(c=>{
+    if(c.got)return;
+    const dx=player.x+player.w/2-c.x,dy=player.y+player.h/2-c.y;
+    if(Math.abs(dx)<34&&Math.abs(dy)<43){
+      c.got=true;coins++;saveData();updateUI();say("🪙 收到金币！");
+    }
+  });
+  // 第四关：箱子推向传感器
+  if(level===4){
+    crate.x=Math.max(180,Math.min(1450,crate.x));
+    doorOpen=crate.x+crate.w>sensor.x+5&&crate.x<sensor.x+sensor.w+crate.w-5;
+    // 出生点后方彩蛋箱：需要往左走到 x< -85
+    if(!chestOpened&&player.x<-300){
+      chestOpened=true;
+      hasOnion=true;
+      saveData();
+      updateUI();
+      say("🎁 发现隐藏宝箱！获得传奇大葱！");
+    }
+    if(player.x>2250&&!doorOpen){
+      player.x=2250;
+      player.vx=0;
+      say("门还锁着！先把木箱推到发光传感器上！");
+    }
+    if(player.x>=LEVEL_LENGTH-110&&doorOpen)completeStage();
+  }
+  // 第五关 Boss
+  if(level===5&&boss.hp>0){
+    boss.attackTimer-=dt;
+    if(boss.attackTimer<=0){
+      const dx=player.x>boss.x?1:-1;
+      bossProjectiles.push({
+        x:boss.x+20,y:GROUND-45,vx:dx*235,life:4
+      });
+      boss.attackTimer=1.65;
+    }
+    bossProjectiles.forEach(p=>{
+      p.x+=p.vx*dt;p.life-=dt;if(Math.abs(player.x+27-p.x)<25&&Math.abs(player.y+27-p.y)<30){
+        hit();p.life=0;
+      }
+    });
+    bossProjectiles=bossProjectiles.filter(p=>p.life>0);
+    if(Math.abs(player.x-boss.x)<50&&player.y+player.h>GROUND-90)hit();
+  }
+  if(player.y>H+80){
+    hit();
+    player.y=GROUND-player.h;
+    player.vy=0;
+  }
+  if(level<=3&&player.x>=LEVEL_LENGTH-120)completeStage();
+  if(level===5&&boss.hp<=0&&player.x>=LEVEL_LENGTH-120)completeStage();
+  updateUI();
+}
+function completeStage(){
+  if(state!=="play")return;
+  state="stage";
+  holding={
+    left:false,right:false,jump:false
+  }
+  ;
+  document.getElementById("stageTitle").textContent="第"+level+"关完成！";
+  document.getElementById("stageText").textContent=level===4?"机关打开了！你成功破解谜题，准备迎接最终 Boss！":level===5?"邪恶团子已经被击败！":"太棒了！准备进入下一关！";
+  document.getElementById("nextStage").textContent=level===5?"查看通关结果":"进入第"+(level+1)+"关";
+  showPanel("stagePanel");
+}
+function drawDango(){
+  const x=player.x-scroll,y=player.y;
+  if(invincible>0&&Math.floor(frame/7)%2===0)return;
+  ctx.save();
+  ctx.translate(x+27,y+28);
+  if(fuel>0){
+    ctx.fillStyle="#667e91";
+    ctx.fillRect(-34,-8,12,29);
+    ctx.fillStyle="#ff9d3b";
+    ctx.beginPath();
+    ctx.moveTo(-34,20);
+    ctx.lineTo(-28,37+Math.random()*4);
+    ctx.lineTo(-22,20);
+    ctx.fill();
+  }
+  ctx.strokeStyle="#65cba8";
+  ctx.lineWidth=10;
+  ctx.lineCap="round";
   ctx.beginPath();
-  ctx.moveTo(Math.cos(a)*17,Math.sin(a)*17);
-  ctx.quadraticCurveTo(
-   Math.cos(a)*45,
-   Math.sin(a)*45+10,
-   Math.cos(a)*40,
-   Math.sin(a)*40+13
-  );
+  ctx.moveTo(-12,-19);
+  ctx.quadraticCurveTo(-39,-48,-44,-65);
+  ctx.moveTo(12,-19);
+  ctx.quadraticCurveTo(39,-48,44,-65);
   ctx.stroke();
- }
-
- ctx.fillStyle="white";
- ctx.beginPath();
- ctx.arc(-9,-5,7,0,7);
- ctx.arc(9,-5,7,0,7);
- ctx.fill();
-
- ctx.fillStyle="#222";
- ctx.beginPath();
- ctx.arc(-9,-5,3,0,7);
- ctx.arc(9,-5,3,0,7);
- ctx.fill();
-
- ctx.restore();
+  ctx.fillStyle="#a5f2d7";
+  ctx.beginPath();
+  ctx.arc(-44,-65,9,0,7);
+  ctx.arc(44,-65,9,0,7);
+  ctx.fill();
+  ctx.fillStyle=equipped==="gold"?"#f5c84c":"#83e0bd";
+  ctx.strokeStyle="#389c80";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.ellipse(0,0,27,29,0,0,7);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle="#83e0bd";
+  ctx.beginPath();
+  ctx.ellipse(-30,8,8,11,-.5,0,7);
+  ctx.ellipse(30,8,8,11,.5,0,7);
+  ctx.fill();
+  ctx.fillStyle="#389c80";
+  ctx.beginPath();
+  ctx.ellipse(-13,27,9,6,0,0,7);
+  ctx.ellipse(13,27,9,6,0,0,7);
+  ctx.fill();
+  ctx.fillStyle="#233b3b";
+  ctx.beginPath();
+  ctx.arc(-10,-5,3.5,0,7);
+  ctx.arc(10,-5,3.5,0,7);
+  ctx.fill();
+  ctx.fillStyle="#ff9eb9";
+  ctx.beginPath();
+  ctx.ellipse(-19,8,5,3,0,0,7);
+  ctx.ellipse(19,8,5,3,0,0,7);
+  ctx.fill();
+  if(equipped==="crown"){
+    ctx.font="27px Arial";
+    ctx.fillText("👑",-14,-29);
+  }
+  if(equipped==="glasses"){
+    ctx.font="23px Arial";
+    ctx.fillText("🕶️",-14,5);
+  }
+  if(equipped==="flower"){
+    ctx.font="24px Arial";
+    ctx.fillText("🌸",-13,-29);
+  }
+  ctx.restore();
 }
-
-// 墨汁
-function drawInk(b){
- ctx.fillStyle="#282238";
- ctx.beginPath();
- ctx.arc(b.x-scroll,b.y,b.r,0,Math.PI*2);
- ctx.fill();
-
- ctx.fillStyle="#50405f";
- ctx.beginPath();
- ctx.arc(b.x-scroll-5,b.y-5,b.r*.45,0,Math.PI*2);
- ctx.fill();
+function drawOctopus(o){
+  const x=o.x-scroll,y=o.baseY+Math.sin(frame*.035+o.phase)*29;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.strokeStyle="#9a69d9";
+  ctx.lineWidth=9;
+  ctx.lineCap="round";
+  for(let i=0;i<6;i++){
+    let a=i*Math.PI/3;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*16,Math.sin(a)*16);
+    ctx.quadraticCurveTo(Math.cos(a)*40,Math.sin(a)*40+9,Math.cos(a)*37,Math.sin(a)*37+12);
+    ctx.stroke();
+  }
+  ctx.fillStyle="#9a69d9";
+  ctx.beginPath();
+  ctx.arc(0,0,26,0,7);
+  ctx.fill();
+  ctx.fillStyle="white";
+  ctx.beginPath();
+  ctx.arc(-9,-5,7,0,7);
+  ctx.arc(9,-5,7,0,7);
+  ctx.fill();
+  ctx.fillStyle="#222";
+  ctx.beginPath();
+  ctx.arc(-9,-5,3,0,7);
+  ctx.arc(9,-5,3,0,7);
+  ctx.fill();
+  ctx.restore();
 }
-
-// 绘制金币
-function drawCoins(){
- gold.forEach(c=>{
-  if(c.got)return;
-
-  let x=c.x-scroll;
-  if(x<-30||x>W+30)return;
-
+function drawCoin(c){
+  const x=c.x-scroll;
+  if(x<-25||x>W+25)return;
+  const pulse=1+Math.sin(frame*.09+c.x)*.08;
+  ctx.save();
+  ctx.translate(x,c.y);
+  ctx.scale(pulse,1);
   ctx.fillStyle="#ffca28";
   ctx.beginPath();
-  ctx.arc(x,c.y,12,0,Math.PI*2);
+  ctx.arc(0,0,12,0,7);
   ctx.fill();
-
   ctx.strokeStyle="#fff1a0";
   ctx.lineWidth=3;
   ctx.stroke();
-
   ctx.fillStyle="#9a6800";
   ctx.font="bold 14px Arial";
-  ctx.fillText("$",x-4,c.y+5);
- });
+  ctx.fillText("$",-4,5);
+  ctx.restore();
 }
-
-// 绘制关卡
 function draw(){
- ctx.clearRect(0,0,W,H);
-
- let sky=ctx.createLinearGradient(0,0,0,H);
- sky.addColorStop(0,level===3?"#c5b5f3":"#65d3ef");
- sky.addColorStop(1,"#e5faff");
-
- ctx.fillStyle=sky;
- ctx.fillRect(0,0,W,H);
-
- // 云朵
- ctx.fillStyle="#ffffffdd";
- for(let i=0;i<7;i++){
-  let x=(i*190-scroll*.15+W*3)%(W+120)-60;
-  ctx.beginPath();
-  ctx.arc(x,100,23,0,7);
-  ctx.arc(x+27,91,30,0,7);
-  ctx.arc(x+56,106,23,0,7);
-  ctx.fill();
- }
-
- // 地面
- ctx.fillStyle=level===3?"#8264b8":"#3fba77";
- ctx.fillRect(0,ground,W,H-ground);
-
- ctx.fillStyle="#268b59";
- for(let x=-(scroll%65);x<W;x+=65){
-  ctx.fillRect(x,ground+25,30,5);
- }
-
- // 陷阱
- obstacles.forEach(o=>{
-  let x=o.x-scroll;
-  if(x<-100||x>W+100)return;
-
-  let y=ground-o.h;
-
-  if(o.moving){
-   y+=Math.sin(frame*.06+o.phase)*18;
+  ctx.clearRect(0,0,W,H);
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,level===3?"#c5b5f3":"#65d3ef");
+  sky.addColorStop(1,"#e5faff");
+  ctx.fillStyle=sky;
+  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#ffffffdd";
+  for(let i=0;i<7;i++){
+    let x=(i*190-scroll*.15+W*3)%(W+120)-60;
+    ctx.beginPath();
+    ctx.arc(x,100,23,0,7);
+    ctx.arc(x+27,91,30,0,7);
+    ctx.arc(x+56,106,23,0,7);
+    ctx.fill();
   }
-
-  ctx.fillStyle=o.type==="spike"?"#ed4769":"#dc783e";
-
-  if(o.type==="spike"){
-   ctx.beginPath();
-   ctx.moveTo(x,ground);
-   ctx.lineTo(x+o.w/2,y);
-   ctx.lineTo(x+o.w,ground);
-   ctx.closePath();
-   ctx.fill();
-  }else{
-   ctx.fillRect(x,y,o.w,ground-y);
+  ctx.fillStyle=level===3?"#8264b8":"#3fba77";
+  ctx.fillRect(0,GROUND,W,H-GROUND);
+  ctx.fillStyle="#268b59";
+  for(let x=-(scroll%65);x<W;x+=65)ctx.fillRect(x,GROUND+25,30,5);
+  platforms.forEach(p=>{
+    ctx.fillStyle="#b78354";ctx.fillRect(p.x-scroll,p.y,p.w,p.h);ctx.fillStyle="#7bd28e";ctx.fillRect(p.x-scroll,p.y,p.w,6);
+  });
+  obstacles.forEach(o=>{
+    let x=o.x-scroll,y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);if(o.type==="spike"){
+      ctx.fillStyle="#ed4769";ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
+    }else{
+      ctx.fillStyle="#dc783e";ctx.fillRect(x,y,o.w,o.h);
+    }
+  });
+  gold.forEach(c=>{
+    if(!c.got)drawCoin(c);
+  });
+  octopus.forEach(drawOctopus);
+  ink.forEach(b=>{
+    ctx.fillStyle="#302542";ctx.beginPath();ctx.arc(b.x-scroll,b.y,b.r,0,7);ctx.fill();
+  });
+  if(level===4){
+    // 箱子和传感器
+    ctx.fillStyle="#c18a4c";
+    ctx.fillRect(crate.x-scroll,GROUND-crate.h,crate.w,crate.h);
+    ctx.strokeStyle="#744a28";
+    ctx.lineWidth=4;
+    ctx.strokeRect(crate.x-scroll,GROUND-crate.h,crate.w,crate.h);
+    ctx.beginPath();
+    ctx.moveTo(crate.x-scroll+7,GROUND-7);
+    ctx.lineTo(crate.x-scroll+crate.w-7,GROUND-crate.h+7);
+    ctx.moveTo(crate.x-scroll+crate.w-7,GROUND-7);
+    ctx.lineTo(crate.x-scroll+7,GROUND-crate.h+7);
+    ctx.stroke();
+    ctx.fillStyle=doorOpen?"#5de49b":"#e45b70";
+    ctx.fillRect(sensor.x-scroll,GROUND-12,sensor.w,12);
+    ctx.fillStyle="#fff";
+    ctx.font="bold 16px Arial";
+    ctx.fillText("传感器",sensor.x-scroll+12,GROUND-24);
+    ctx.fillStyle=doorOpen?"#72d99c":"#59677a";
+    ctx.fillRect(2250-scroll,GROUND-145,24,145);
+    ctx.fillStyle="#fff";
+    ctx.font="bold 16px Arial";
+    ctx.fillText(doorOpen?"门已打开":"门锁住了",2185-scroll,GROUND-160);
+    // 隐藏宝箱在出生点左后方
+    if(!chestOpened){
+      ctx.fillStyle="#d99b37";
+      ctx.fillRect(-340-scroll,GROUND-36,43,34);
+      ctx.fillStyle="#ffdc70";
+      ctx.fillRect(-340-scroll,GROUND-43,43,10);
+      ctx.fillStyle="#805323";
+      ctx.fillRect(-322-scroll,GROUND-29,7,13);
+    }
+    else{
+      ctx.fillStyle="#d99b37";
+      ctx.fillRect(-340-scroll,GROUND-36,43,34);
+      ctx.fillStyle="#ffdc70";
+      ctx.fillRect(-340-scroll,GROUND-49,43,9);
+    }
+    ctx.fillStyle="#fff";
+    ctx.font="13px Arial";
+    if(player.x < -170)ctx.fillText("继续往回走！",-385-scroll,GROUND-57);
   }
- });
-
- drawCoins();
-
- octopus.forEach(o=>drawOctopus(o));
- ink.forEach(b=>drawInk(b));
-
- // 终点
- let finish=LEVEL_LENGTH-scroll;
-
- ctx.fillStyle="#28354b";
- ctx.fillRect(finish,220,9,215);
- ctx.fillStyle="#ffd166";
- ctx.fillRect(finish+9,220,90,50);
- ctx.fillStyle="#27334e";
- ctx.font="bold 22px Arial";
- ctx.fillText("终点",finish+15,253);
-
- if(player && !(invincible>0&&Math.floor(frame/6)%2===0)){
-  drawPlayer();
- }
-
- ctx.fillStyle="#27334e";
- ctx.font="bold 22px Arial";
- ctx.fillText("第"+level+"关",20,35);
+  if(level===5){
+    const bx=boss.x-scroll,by=GROUND-72;
+    ctx.fillStyle=boss.flash>0?"#fff":"#8751a8";
+    ctx.beginPath();
+    ctx.ellipse(bx+30,by+38,34,35,0,0,7);
+    ctx.fill();
+    ctx.fillStyle="#572b75";
+    ctx.beginPath();
+    ctx.ellipse(bx+12,by+8,8,18,-.4,0,7);
+    ctx.ellipse(bx+48,by+8,8,18,.4,0,7);
+    ctx.fill();
+    ctx.fillStyle="white";
+    ctx.beginPath();
+    ctx.arc(bx+18,by+31,7,0,7);
+    ctx.arc(bx+42,by+31,7,0,7);
+    ctx.fill();
+    ctx.fillStyle="#26172e";
+    ctx.beginPath();
+    ctx.arc(bx+18,by+31,3,0,7);
+    ctx.arc(bx+42,by+31,3,0,7);
+    ctx.fill();
+    ctx.fillStyle="#26334a";
+    ctx.fillRect(bx-12,by-24,84,11);
+    ctx.fillStyle="#e84d68";
+    ctx.fillRect(bx-12,by-24,84*boss.hp/100,11);
+    ctx.fillStyle="#fff";
+    ctx.font="bold 17px Arial";
+    ctx.fillText("邪恶团子 "+boss.hp+"/100",bx-15,by-32);
+    bossProjectiles.forEach(p=>{
+      ctx.fillStyle="#e65d52";ctx.beginPath();ctx.arc(p.x-scroll,p.y,11,0,7);ctx.fill();
+    });
+    ctx.fillStyle="#fff";
+    ctx.font="bold 18px Arial";
+    ctx.fillText("普通攻击 -5　传奇大葱 -15",20,70);
+  }
+  // 终点
+  const finish=LEVEL_LENGTH-scroll;
+  ctx.fillStyle="#28354b";
+  ctx.fillRect(finish,220,9,215);
+  ctx.fillStyle="#ffd166";
+  ctx.fillRect(finish+9,220,90,50);
+  ctx.fillStyle="#27334e";
+  ctx.font="bold 22px Arial";
+  ctx.fillText("终点",finish+15,253);
+  drawDango();
 }
-
-// 更新游戏
-function update(){
- if(state!=="play")return;
-
- frame++;
-
- // 左右移动
- let speed=4.5;
- player.vx=0;
-
- if(holding.left)player.vx=-speed;
- if(holding.right)player.vx=speed;
-
- player.x+=player.vx;
-
- // 限制移动范围
- player.x=Math.max(0,Math.min(LEVEL_LENGTH-player.w,player.x));
-
- // 摄像机跟随
- scroll=Math.max(0,Math.min(
-  LEVEL_LENGTH-W,
-  player.x-260
- ));
-
- // 重力
- player.vy+=.7;
-
- if(holding.jump&&fuel>0){
-  player.vy-=1.25;
-  player.vy=Math.max(player.vy,-9);
-  fuel--;
- }
-
- player.y+=player.vy;
-
- if(player.y+player.h>=ground){
-  player.y=ground-player.h;
-  player.vy=0;
- }
-
- if(invincible>0)invincible--;
-
- // 陷阱碰撞
- obstacles.forEach(o=>{
-  if(state!=="play")return;
-
-  let y=ground-o.h;
-  if(o.moving)y+=Math.sin(frame*.06+o.phase)*18;
-
-  let x=o.x-scroll;
-
-  if(
-   player.x-scroll+player.w-8>x+5&&
-   player.x-scroll+8<x+o.w-5&&
-   player.y+player.h>y+8
-  ){
-   hit();
-  }
- });
-
- // 收集金币
- gold.forEach(c=>{
-  if(c.got)return;
-
-  let px=player.x+player.w/2;
-  let py=player.y+player.h/2;
-
-  if(
-   Math.abs(px-c.x)<28&&
-   Math.abs(py-c.y)<35
-  ){
-   c.got=true;
-   coins++;
-   saveData();
-   updateUI();
-   document.getElementById("msg").textContent="🪙 获得一枚金币！";
-  }
- });
-
- // 章鱼移动、喷墨
- octopus.forEach(o=>{
-  if(state!=="play")return;
-
-  let target=player.x+200;
-
-  o.x+=Math.sin(frame*.025+o.phase)*1.2;
-  o.x=Math.max(450,Math.min(LEVEL_LENGTH-250,o.x));
-
-  let y=o.baseY+Math.sin(frame*.045+o.phase)*35;
-
-  o.cooldown--;
-
-  if(o.cooldown<=0){
-   ink.push({
-    x:o.x,
-    y:y,
-    vx:player.x>o.x? -3:3,
-    vy:(player.y+player.h/2-y)*.012,
-    r:12
-   });
-
-   o.cooldown=130+Math.random()*140;
-  }
-
-  // 章鱼碰撞
-  let dx=player.x+player.w/2-o.x;
-  let dy=player.y+player.h/2-y;
-
-  if(Math.abs(dx)<43&&Math.abs(dy)<42){
-   hit();
-  }
- });
-
- // 墨汁移动与碰撞
- ink.forEach(b=>{
-  b.x+=b.vx;
-  b.y+=b.vy;
-
-  let dx=player.x+player.w/2-b.x;
-  let dy=player.y+player.h/2-b.y;
-
-  if(Math.abs(dx)<25&&Math.abs(dy)<25){
-   if(invincible<=0)hit();
-   b.x=-10000;
-  }
- });
-
- ink=ink.filter(b=>b.x>scroll-100&&b.x<scroll+W+100);
-
- // 掉出地图
- if(player.y>H+100){
-  hit();
-  player.y=ground-player.h;
-  player.vy=0;
- }
-
- // 到达关卡终点
- if(state==="play"&&player.x>=LEVEL_LENGTH-100){
-  state="stage";
-  holding={left:false,right:false,jump:false};
-
-  if(level<3){
-   document.getElementById("stageTitle").textContent=
-    "第"+level+"关完成！";
-
-   document.getElementById("stageText").textContent=
-    "太棒了！准备进入第"+(level+1)+"关！";
-
-   document.getElementById("nextStage").textContent=
-    "进入第"+(level+1)+"关";
-
-   showPanel("stagePanel");
-  }else{
-   finishGame(true);
-  }
- }
-
- updateUI();
+function loop(t){
+  const dt=lastTime?Math.min((t-lastTime)/1000,.035):0;
+  lastTime=t;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
 }
-
-// 主循环
-function loop(){
- update();
- draw();
- requestAnimationFrame(loop);
-}
-
-// 控制按键
 function bindHold(id,key){
- const btn=document.getElementById(id);
-
- btn.addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  holding[key]=true;
-
-  if(key==="jump")jump();
- });
-
- btn.addEventListener("pointerup",e=>{
-  e.preventDefault();
-  holding[key]=false;
- });
-
- btn.addEventListener("pointercancel",()=>{
-  holding[key]=false;
- });
-
- btn.addEventListener("lostpointercapture",()=>{
-  holding[key]=false;
- });
+  const el=document.getElementById(id);
+  el.addEventListener("pointerdown",e=>{
+    e.preventDefault();el.setPointerCapture?.(e.pointerId);holding[key]=true;if(key==="jump")jump();
+  });
+  const release=e=>{
+    holding[key]=false;
+  }
+  ;
+  el.addEventListener("pointerup",release);
+  el.addEventListener("pointercancel",release);
+  el.addEventListener("lostpointercapture",release);
 }
-
 bindHold("left","left");
 bindHold("right","right");
 bindHold("jump","jump");
-
-window.addEventListener("pointerup",()=>{
- holding.left=false;
- holding.right=false;
- holding.jump=false;
+document.getElementById("attack").addEventListener("pointerdown",e=>{
+  e.preventDefault();attack();
 });
-
 window.addEventListener("keydown",e=>{
- if(e.code==="ArrowLeft"||e.code==="KeyA"){
-  holding.left=true;
- }
- if(e.code==="ArrowRight"||e.code==="KeyD"){
-  holding.right=true;
- }
- if(e.code==="Space"||e.code==="ArrowUp"){
-  e.preventDefault();
-  if(!e.repeat)jump();
-  holding.jump=true;
- }
+  if(["ArrowLeft","ArrowRight","ArrowUp","Space"].includes(e.code))e.preventDefault();
+  if(e.code==="ArrowLeft"||e.code==="KeyA")holding.left=true;
+  if(e.code==="ArrowRight"||e.code==="KeyD")holding.right=true;
+  if(e.code==="ArrowUp"||e.code==="Space"||e.code==="KeyW"){
+    if(!holding.jump)jump();holding.jump=true;
+  }
+  if(e.code==="KeyJ")attack();
+  if(e.code==="Escape"&&state==="play"){
+    state="paused";previousState="play";showPanel("rulesPanel");
+  }
 });
-
 window.addEventListener("keyup",e=>{
- if(e.code==="ArrowLeft"||e.code==="KeyA")holding.left=false;
- if(e.code==="ArrowRight"||e.code==="KeyD")holding.right=false;
- if(e.code==="Space"||e.code==="ArrowUp")holding.jump=false;
+  if(e.code==="ArrowLeft"||e.code==="KeyA")holding.left=false;
+  if(e.code==="ArrowRight"||e.code==="KeyD")holding.right=false;
+  if(e.code==="ArrowUp"||e.code==="Space"||e.code==="KeyW")holding.jump=false;
 });
-
-// 页面按钮
-document.getElementById("startAdventure").onclick=()=>showPanel("tutorial");
-document.getElementById("tutorialStart").onclick=startGame;
-document.getElementById("nextStage").onclick=nextLevel;
-document.getElementById("restart").onclick=restartLevel;
+window.addEventListener("blur",()=>{
+  holding={
+    left:false,right:false,jump:false
+  };
+});
+document.getElementById("startAdventure").onclick=()=>{
+  say("教程已打开，点击开始第一关即可进入游戏。");
+  showPanel("tutorial");
+}
+;
+document.getElementById("tutorialStart").onclick=()=>{
+  startGame();
+  say("🎮 第一关开始！点击左右移动、跳跃按钮即可操作。");
+}
+;
+document.getElementById("nextStage").onclick=startNext;
+document.getElementById("restart").onclick=()=>{
+  if(state!=="menu"){
+    makeLevel();
+    state="play";
+    closePanel();
+    say("本关重新开始！");
+  }
+}
+;
 document.getElementById("redeem").onclick=redeem;
-
-document.getElementById("shopButton").onclick=openShop;
-document.getElementById("welcomeShop").onclick=openShop;
-document.getElementById("shopBack").onclick=closeShop;
-document.getElementById("endingShop").onclick=openShop;
-
-document.getElementById("endingRestart").onclick=startGame;
-
-document.getElementById("rulesButton").onclick=()=>{
- previousState=state;
- if(state==="play")state="paused";
- showPanel("rulesPanel");
-};
-
-document.getElementById("rulesBack").onclick=()=>{
- if(previousState==="play")state="play";
- closePanel();
-};
-
-document.getElementById("disclaimerButton").onclick=()=>{
- previousState=state;
- if(state==="play")state="paused";
- showPanel("disclaimer");
-};
-
-document.getElementById("disclaimerBack").onclick=()=>{
- if(previousState==="play")state="play";
- closePanel();
-};
-
 document.getElementById("code").addEventListener("keydown",e=>{
- if(e.key==="Enter")redeem();
+  if(e.key==="Enter")redeem();
 });
-
-// 初始化
+document.getElementById("shopButton").onclick=openShop;
+document.getElementById("welcomeShop").onclick=()=>{
+  previousState="menu";
+  renderShop();
+  showPanel("shopPanel");
+}
+;
+document.getElementById("shopBack").onclick=closeShop;
+document.getElementById("endingShop").onclick=()=>{
+  previousState="ending";
+  renderShop();
+  showPanel("shopPanel");
+}
+;
+document.getElementById("endingRestart").onclick=startGame;
+document.getElementById("endingHome").onclick=()=>{
+  state="menu";
+  showPanel("welcome");
+}
+;
+document.getElementById("rulesButton").onclick=()=>{
+  previousState=state;
+  if(state==="play")state="paused";
+  showPanel("rulesPanel");
+}
+;
+document.getElementById("rulesBack").onclick=()=>{
+  if(previousState==="play")state="play";
+  else if(previousState==="paused")state="paused";
+  closePanel();
+}
+;
+document.getElementById("welcomeDisclaimer").onclick=()=>{
+  previousState="menu";
+  showPanel("disclaimer");
+}
+;
+document.getElementById("disclaimerButton").onclick=()=>{
+  previousState=state;
+  if(state==="play")state="paused";
+  showPanel("disclaimer");
+}
+;
+document.getElementById("disclaimerBack").onclick=()=>{
+  if(previousState==="play")state="play";
+  else if(previousState==="menu")showPanel("welcome");
+  else closePanel();
+}
+;
 player={
- x:100,y:ground-55,w:55,h:55,vx:0,vy:0
-};
-
+  x:100,y:GROUND-55,w:55,h:55,vx:0,vy:0,onGround:true,facing:1
+}
+;
+window.tuanziGame={
+  start:startGame,openShop:openShop,showRules:()=>{
+    previousState=state;
+    if(state==="play")state="paused";
+    showPanel("rulesPanel");
+  }
+  ,getState:()=>({
+    state,level,lives,coins
+  })
+}
+;
 makeLevel();
 updateUI();
 draw();
 requestAnimationFrame(loop);
-
 </script>
+
+<script>
+/* 独立按钮反馈层：即使触屏浏览器的 pointer 事件表现不同，菜单按钮仍保留 click 反馈。 */
+(function () {
+  "use strict";
+  const menuButtonIds = [
+  "startAdventure", "welcomeTutorial", "tutorialStart", "welcomeShop", "welcomeDisclaimer",
+  "shopBack", "rulesBack", "nextStage", "endingRestart", "endingShop",
+  "endingHome", "disclaimerBack", "restart", "shopButton", "rulesButton",
+  "redeem", "disclaimerButton"
+  ];
+  menuButtonIds.forEach(function (id) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    element.addEventListener("click", function () {
+      element.classList.add("clicked-feedback");
+      window.setTimeout(function () {
+        element.classList.remove("clicked-feedback");
+      }, 150);
+    }, {
+      passive: true
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
