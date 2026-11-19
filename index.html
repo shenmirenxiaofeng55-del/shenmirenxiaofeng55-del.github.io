@@ -402,7 +402,7 @@ let crate={
 ;
 let doorOpen=false,chestOpened=localStorage.getItem("tuanziChestOpened")==="yes";
 let boss={
-  x:2100,y:GROUND-75,hp:100,maxHp:100,attackTimer:1.4,flash:0
+  x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
 }
 ;
 let bossProjectiles=[],attackCooldown=0,toastFrames=0;
@@ -508,7 +508,7 @@ function makeLevel(){
   }
   if(level===5){
     boss={
-      x:2100,y:GROUND-75,hp:100,maxHp:100,attackTimer:1.3,flash:0
+      x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
     }
     ;
     for(let i=0;i<10;i++)gold.push({
@@ -747,7 +747,12 @@ function update(dt){
     let y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
     const bx=o.x-scroll;
     if(o.type==="spike"){
-      if(player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&player.y+player.h>y+12)hit();
+      const crateCoversSpike=level===4 &&
+        crate.x<o.x+o.w+crate.w*0.15 &&
+        crate.x+crate.w>o.x-o.w*0.15;
+      if(!crateCoversSpike &&
+         player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&
+         player.y+player.h>y+12)hit();
     }else if(rectHit({
       x:player.x,y:player.y,w:player.w,h:player.h
     },{
@@ -799,23 +804,59 @@ function update(dt){
     }
     if(player.x>=LEVEL_LENGTH-110&&doorOpen)completeStage();
   }
-  // 第五关 Boss
+  // 第五关 Boss：三种技能轮换，攻击前有短暂预警
   if(level===5&&boss.hp>0){
     boss.attackTimer-=dt;
-    if(boss.attackTimer<=0){
-      const dx=player.x>boss.x?1:-1;
-      bossProjectiles.push({
-        x:boss.x+20,y:GROUND-45,vx:dx*235,life:4
-      });
-      boss.attackTimer=1.65;
+    boss.skillTimer-=dt;
+    boss.phase+=dt*2.2;
+    if(boss.charge>0){
+      boss.charge-=dt;
+      boss.x+=boss.chargeDir*520*dt;
+      if(Math.abs(player.x-boss.x)<92 && player.y+player.h>GROUND-125)hit();
+      if(boss.charge<=0){
+        boss.x=Math.max(520,Math.min(LEVEL_LENGTH-420,boss.x));
+        boss.attackTimer=0.65;
+      }
+    }else if(boss.skillTimer<=0){
+      const roll=Math.floor(Math.random()*3);
+      if(roll===0){
+        for(let i=-1;i<=1;i++){
+          const dx=(player.x+player.w/2)-(boss.x+62);
+          bossProjectiles.push({
+            x:boss.x+62,y:GROUND-80+i*23,
+            vx:Math.sign(dx||-1)*(260+Math.abs(i)*35),
+            vy:i*75,life:4.2,r:14,kind:"fire"
+          });
+        }
+        say("🔥 邪恶团子：三连暗影火球！");
+      }else if(roll===1){
+        bossProjectiles.push({
+          x:boss.x-80,y:GROUND-15,vx:player.x<boss.x?-360:360,
+          vy:0,life:4.5,r:20,kind:"wave"
+        });
+        say("⚡ 地面冲击波！跳起来躲开！");
+      }else{
+        boss.charge=0.72;
+        boss.chargeDir=player.x<boss.x?-1:1;
+        say("💢 邪恶团子正在蓄力冲锋！快躲开！");
+      }
+      boss.skillTimer=3.4+Math.random()*1.0;
     }
     bossProjectiles.forEach(p=>{
-      p.x+=p.vx*dt;p.life-=dt;if(Math.abs(player.x+27-p.x)<25&&Math.abs(player.y+27-p.y)<30){
-        hit();p.life=0;
+      p.x+=p.vx*dt;
+      p.y+=(p.vy||0)*dt;
+      p.life-=dt;
+      const hitX=Math.abs(player.x+player.w/2-p.x)<(p.r||14)+22;
+      const hitY=Math.abs(player.y+player.h/2-p.y)<(p.r||14)+27;
+      if(hitX&&hitY){
+        if(p.kind==="wave" && player.y+player.h<GROUND-22){
+          // 跳过冲击波
+        }else hit();
+        p.life=0;
       }
     });
     bossProjectiles=bossProjectiles.filter(p=>p.life>0);
-    if(Math.abs(player.x-boss.x)<50&&player.y+player.h>GROUND-90)hit();
+    if(Math.abs(player.x-boss.x)<92&&player.y+player.h>GROUND-125)hit();
   }
   if(player.y>H+80){
     hit();
@@ -1037,39 +1078,55 @@ function draw(){
     if(player.x < -170)ctx.fillText("继续往回走！",-385-scroll,GROUND-57);
   }
   if(level===5){
-    const bx=boss.x-scroll,by=GROUND-72;
-    ctx.fillStyle=boss.flash>0?"#fff":"#8751a8";
-    ctx.beginPath();
-    ctx.ellipse(bx+30,by+38,34,35,0,0,7);
-    ctx.fill();
+    const bx=boss.x-scroll,by=GROUND-146;
+    const rage=boss.hp<boss.maxHp*0.35;
+    ctx.save();
+    ctx.globalAlpha=0.22+Math.sin(frame*.12)*.06;
+    ctx.fillStyle=rage?"#ff334f":"#9b42d6";
+    ctx.beginPath();ctx.ellipse(bx+62,GROUND-48,88,24,0,0,7);ctx.fill();
+    ctx.restore();
+    ctx.fillStyle=boss.flash>0?"#fff":(rage?"#d83c55":"#8751a8");
+    ctx.beginPath();ctx.ellipse(bx+62,by+93,68,72,0,0,7);ctx.fill();
     ctx.fillStyle="#572b75";
     ctx.beginPath();
-    ctx.ellipse(bx+12,by+8,8,18,-.4,0,7);
-    ctx.ellipse(bx+48,by+8,8,18,.4,0,7);
+    ctx.ellipse(bx+34,by+27,17,35,-.4,0,7);
+    ctx.ellipse(bx+90,by+27,17,35,.4,0,7);
     ctx.fill();
-    ctx.fillStyle="white";
-    ctx.beginPath();
-    ctx.arc(bx+18,by+31,7,0,7);
-    ctx.arc(bx+42,by+31,7,0,7);
-    ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.beginPath();ctx.arc(bx+39,by+79,15,0,7);ctx.arc(bx+85,by+79,15,0,7);ctx.fill();
     ctx.fillStyle="#26172e";
-    ctx.beginPath();
-    ctx.arc(bx+18,by+31,3,0,7);
-    ctx.arc(bx+42,by+31,3,0,7);
-    ctx.fill();
-    ctx.fillStyle="#26334a";
-    ctx.fillRect(bx-12,by-24,84,11);
-    ctx.fillStyle="#e84d68";
-    ctx.fillRect(bx-12,by-24,84*boss.hp/100,11);
-    ctx.fillStyle="#fff";
-    ctx.font="bold 17px Arial";
-    ctx.fillText("邪恶团子 "+boss.hp+"/100",bx-15,by-32);
+    ctx.beginPath();ctx.arc(bx+42,by+80,7,0,7);ctx.arc(bx+88,by+80,7,0,7);ctx.fill();
+    ctx.strokeStyle="#2b1538";ctx.lineWidth=8;ctx.lineCap="round";
+    ctx.beginPath();ctx.moveTo(bx+45,by+119);ctx.quadraticCurveTo(bx+62,by+132,bx+82,by+118);ctx.stroke();
+    ctx.fillStyle="#f5c84c";ctx.beginPath();
+    ctx.moveTo(bx+20,by+31);ctx.lineTo(bx+25,by-3);ctx.lineTo(bx+46,by+17);
+    ctx.lineTo(bx+62,by-12);ctx.lineTo(bx+78,by+17);ctx.lineTo(bx+100,by-3);
+    ctx.lineTo(bx+105,by+31);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#e64c68";ctx.fillRect(bx+3,by+139,118,16);
+    if(boss.charge>0){
+      ctx.fillStyle="rgba(255,55,75,.28)";ctx.fillRect(0,GROUND-30,W,30);
+      ctx.fillStyle="#ff5266";ctx.font="bold 18px Arial";
+      ctx.fillText("⚠ BOSS 冲锋！",W/2-70,GROUND-42);
+    }
     bossProjectiles.forEach(p=>{
-      ctx.fillStyle="#e65d52";ctx.beginPath();ctx.arc(p.x-scroll,p.y,11,0,7);ctx.fill();
+      ctx.fillStyle=p.kind==="wave"?"#f7b83e":"#e65d52";
+      ctx.beginPath();
+      if(p.kind==="wave")ctx.ellipse(p.x-scroll,p.y,25,12,0,0,7);
+      else ctx.arc(p.x-scroll,p.y,p.r||14,0,7);
+      ctx.fill();
     });
-    ctx.fillStyle="#fff";
-    ctx.font="bold 18px Arial";
-    ctx.fillText("普通攻击 -5　传奇大葱 -15",20,70);
+    ctx.fillStyle="rgba(25,17,38,.88)";ctx.fillRect(12,10,W-24,42);
+    ctx.fillStyle="#fff";ctx.font="bold 17px Arial";
+    ctx.fillText("👑 邪恶团子 · 最终 Boss",24,29);
+    ctx.textAlign="right";ctx.fillText(Math.ceil(boss.hp)+" / "+boss.maxHp,W-24,29);
+    ctx.textAlign="left";
+    ctx.fillStyle="#49314f";ctx.fillRect(24,35,W-48,10);
+    const hpw=(W-48)*Math.max(0,boss.hp/boss.maxHp);
+    const grad=ctx.createLinearGradient(24,0,W-24,0);
+    grad.addColorStop(0,"#ff334f");grad.addColorStop(1,"#ffb347");
+    ctx.fillStyle=grad;ctx.fillRect(24,35,hpw,10);
+    ctx.fillStyle="#fff";ctx.font="bold 15px Arial";
+    ctx.fillText("普通攻击 -5　传奇大葱 -15",20,76);
   }
   // 终点
   const finish=LEVEL_LENGTH-scroll;
