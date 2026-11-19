@@ -125,6 +125,9 @@ button:disabled{
 #attack{
   background:#ffb3a7
 }
+#release{
+  background:#b7d8ff
+}
 #shopItems{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -223,6 +226,278 @@ button:focus-visible, input:focus-visible {
 #attack {
   background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
 }
+#release {
+  background: linear-gradient(180deg, #cfe4ff, #9cc4ff);
+}
+#msg {
+  padding: 8px 12px;
+  margin: 7px auto;
+  width: min(960px, 96%);
+  border: 1px solid rgba(255, 226, 154, .15);
+  border-radius: 12px;
+  background: rgba(31, 45, 68, .55);
+}
+.panel {
+  background:
+  radial-gradient(circle at 100% 0%, rgba(169,240,208,.12), transparent 35%),
+  linear-gradient(145deg, #2b3c59, #202d46);
+  border: 1px solid rgba(195,255,231,.55);
+  box-shadow: 0 25px 80px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.08);
+  animation: panelIn .22s ease-out;
+}
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.panel h2 {
+  text-shadow: 0 2px 14px rgba(169,240,208,.16);
+}
+.shopItem {
+  border: 1px solid rgba(196,255,230,.12);
+  background: linear-gradient(145deg, #3b506f, #2c3e5b);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.shopItem p {
+  color: #d4e3f4;
+}
+#overlay {
+  backdrop-filter: b<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🍡 团子冒险世界</title>
+<style>
+*{
+  box-sizing:border-box
+}
+:root{
+  --mint:#a9f0d0;
+  --deep:#11172b;
+  --panel:#26344f
+}
+body{
+  margin:0;
+  padding:12px;
+  text-align:center;
+  background:var(--deep);
+  color:white;
+  font-family:Arial,system-ui,sans-serif
+}
+h1{
+  color:var(--mint);
+  margin:8px
+}
+.info{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px
+}
+.info span{
+  background:#27334e;
+  padding:9px 12px;
+  border-radius:12px;
+  font-weight:bold
+}
+canvas{
+  display:block;
+  width:100%;
+  max-width:960px;
+  height:auto;
+  margin:auto;
+  border:3px solid white;
+  border-radius:15px;
+  background:#9be7f5;
+  touch-action:none
+}
+button{
+  border:0;
+  border-radius:11px;
+  padding:12px 16px;
+  margin:5px;
+  font-weight:bold;
+  font-size:15px;
+  background:var(--mint);
+  color:#17352c;
+  cursor:pointer;
+  touch-action:manipulation
+}
+button:active{
+  transform:scale(.96)
+}
+button:disabled{
+  opacity:.55
+}
+#overlay{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  background:#10172bee
+}
+.panel{
+  width:min(470px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--panel);
+  border:2px solid #9ee8cf;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 15px 50px #0008
+}
+.panel h2{
+  color:var(--mint)
+}
+.panel p{
+  line-height:1.7
+}
+.hidden{
+  display:none!important
+}
+.big{
+  font-size:65px
+}
+#msg{
+  color:#ffe49b;
+  min-height:24px
+}
+.controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:12px auto;
+  max-width:500px
+}
+.controls button{
+  width:85px;
+  height:65px;
+  font-size:25px;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none
+}
+#jump{
+  background:#ffd166
+}
+#attack{
+  background:#ffb3a7
+}
+#release{
+  background:#b7d8ff
+}
+#shopItems{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
+}
+.shopItem{
+  background:#344461;
+  padding:12px;
+  border-radius:12px
+}
+.shopItem button{
+  font-size:13px
+}
+footer{
+  margin:25px auto;
+  color:#aebbd0;
+  font-size:12px;
+  line-height:1.8
+}
+.small{
+  font-size:12px;
+  color:#b9c6db
+}
+input{
+  width:130px;
+  padding:11px;
+  border-radius:10px;
+  border:1px solid #9ee8cf;
+  background:#17243b;
+  color:white
+}
+@media(max-width:520px){
+  body{
+    padding:7px
+  }
+  .controls button{
+    width:76px;
+    height:62px
+  }
+  .panel{
+    padding:17px
+  }
+}
+/* ===== 精致界面增强 ===== */
+:root {
+  --mint: #a9f0d0;
+  --mint-bright: #c8ffe8;
+  --gold: #ffd166;
+  --coral: #ff9e9e;
+  --deep: #10182c;
+  --panel: #263650;
+}
+body {
+  min-height: 100vh;
+  background:
+  radial-gradient(circle at 12% 8%, rgba(95, 190, 169, .16), transparent 28%),
+  radial-gradient(circle at 88% 18%, rgba(109, 145, 220, .15), transparent 30%),
+  linear-gradient(145deg, #10182c, #17243b 55%, #10182c);
+}
+h1 {
+  text-shadow: 0 3px 18px rgba(119, 255, 211, .22);
+  letter-spacing: 1px;
+}
+.info span {
+  border: 1px solid rgba(184, 255, 225, .16);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .16);
+  backdrop-filter: blur(8px);
+}
+canvas {
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .34), 0 0 0 1px rgba(205,255,236,.16);
+}
+button {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .16), 0 8px 20px rgba(0,0,0,.12);
+  transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
+}
+button:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+button:active {
+  transform: translateY(2px) scale(.98);
+  box-shadow: 0 2px 0 rgba(0,0,0,.16);
+}
+button:focus-visible, input:focus-visible {
+  outline: 3px solid #fff0a8;
+  outline-offset: 3px;
+}
+#left, #right {
+  background: linear-gradient(180deg, #b8f4dc, #7dd9b7);
+}
+#jump {
+  background: linear-gradient(180deg, #ffe59b, #ffc64e);
+}
+#attack {
+  background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
+}
+#release {
+  background: linear-gradient(180deg, #cfe4ff, #9cc4ff);
+}
 #msg {
   padding: 8px 12px;
   margin: 7px auto;
@@ -309,6 +584,7 @@ footer {
  <button id="restart">重新开始本关</button>
  <button id="shopButton">👕 团子商店</button>
  <button id="rulesButton">游戏规则</button>
+ <button id="release">🖐️ 松开箱子</button>
 </div>
 <div>
  <input id="code" maxlength="4" placeholder="输入作弊码">
@@ -342,6 +618,7 @@ footer {
  <div class="panel hidden" id="rulesPanel">
   <h2>📖 游戏规则</h2>
   <p>❤️ 三条生命；⬅️➡️ 自由移动；⬆️ 跳跃和飞行；🐙 章鱼会移动并喷墨；🪙 收集金币购买装扮；第四关推箱子解谜；第五关挑战邪恶团子。</p>
+  <p>第四关小提示：推箱子时如果不想再推了，点击「🖐️ 松开箱子」按钮，箱子会留在原地。</p>
   <button id="rulesBack">返回</button>
  </div>
  <div class="panel hidden" id="stagePanel">
@@ -407,6 +684,8 @@ let boss={
 }
 ;
 let bossProjectiles=[],attackCooldown=0,toastFrames=0;
+/* 新增：推箱「松开」冷却计时器。按下「🖐️ 松开箱子」后 0.5 秒内不再推动箱子。 */
+let noPushTimer=0;
 const cosmetics=[
 {
   id:"normal",name:"原始团子",price:0,emoji:"🍡"
@@ -466,6 +745,7 @@ function makeLevel(){
   bossProjectiles=[];
   scroll=0;
   doorOpen=false;
+  noPushTimer=0;
   if(level<=3){
     let x=420;
     while(x<LEVEL_LENGTH-180){
@@ -682,74 +962,131 @@ function rectHit(a,b){
 }
 
 /* ============================================================
-   第四关推箱子：标准 Sokoban 式“穿透深度推动”
+   第四关推箱子：修复「箱子粘着团子」的核心逻辑
    ------------------------------------------------------------
-   之前版本的错误做法：
-     先移动玩家，再根据重叠“顺手”修改玩家 y 坐标做垂直分离，
-     结果玩家站地面推箱时被错误吸附到箱顶，箱子就再也推不动。
+   旧版的致命 bug：
+     向左移动时用 overlap=(crate.x+crate.w)-player.x 计算穿透深度，
+     这个值在「玩家位于箱子左侧」时也是正数，
+     于是玩家往左走反而把箱子往左拉，箱子就永远粘在玩家身上。
 
-   现在的做法（参考开源推箱子实现思路）：
-     1. 只处理水平轴：先按 vx 计算玩家的目标 x。
-     2. 判断玩家与箱子是否有“真正的侧面重叠”（排除站在箱顶）。
-     3. 若重叠，穿透深度 overlap 就是箱子应被推开的距离。
-     4. 检查箱子目标位置是否越界/撞门柱；撞了就只把玩家吸附回箱子边缘。
-     5. 推动成功时箱子移动 overlap，玩家吸附到箱子边缘，消除浮点残差。
-     6. 本函数绝不修改 player.y / player.vy，垂直落地完全交给 update 的
-        landing 逻辑处理，因此不会再出现“瞬移到箱顶”的问题。
+   现在的判定（标准 Sokoban 侧向接触模型）：
+     只有当「玩家移动前在箱子一侧、移动后跨入箱子」时才推箱。
+     · 向右移动：移动前玩家右缘 <= 箱子左缘(+1 容差)，移动后右缘 > 箱子左缘
+     · 向左移动：移动前玩家左缘 >= 箱子右缘(-1 容差)，移动后左缘 < 箱子右缘
+     其它情况（玩家远离箱子、玩家在箱子另一侧、玩家站箱顶）一律不推箱。
+     这样玩家向左走不会再拖动箱子。
+
+   另外新增 noPushTimer：按下「🖐️ 松开箱子」后 0.5 秒内完全禁用推箱，
+   给玩家一个主动「放下箱子」的操作。
    ============================================================ */
 function tryPushCrate(dt){
   if(level!==4)return;
 
   const dx=player.vx*dt*60;
-  if(Math.abs(dx)<0.0001)return;
-
   const oldPlayerX=player.x;
 
-  // 先按水平速度移动玩家，并做场地边界 clamp
-  player.x=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,player.x+dx));
-  const movedX=player.x-oldPlayerX;
-  if(Math.abs(movedX)<0.0001)return;
+  // 没有水平速度：不移动，也不推箱
+  if(Math.abs(dx)<0.0001)return;
 
-  // 玩家站在箱顶时不参与水平推箱：
-  // 底部必须明显低于箱顶（+6 容差），顶部必须高于箱底（-6 容差）
+  const oldPlayerRight=oldPlayerX+player.w;
+  const oldPlayerLeft=oldPlayerX;
+  const crateLeft=crate.x;
+  const crateRight=crate.x+crate.w;
+
+  // 垂直方向必须与箱子有侧面重叠（站在箱顶不算推箱）
   const verticalOverlap=
     player.y+player.h>crate.y+6 &&
     player.y<crate.y+crate.h-6;
-  if(!verticalOverlap)return;
 
-  // 计算玩家与箱子的水平穿透深度
-  let overlap=0;
-  if(movedX>0){
-    overlap=(player.x+player.w)-crate.x;
-  }else{
-    overlap=(crate.x+crate.w)-player.x;
-  }
-  if(overlap<=0)return; // 只是靠近，还没有真正接触
-
-  // 箱子需要被推开的距离 = 穿透深度
-  const targetCrateX=movedX>0?crate.x+overlap:crate.x-overlap;
-
-  // 箱子目标位置合法性：场地边界 + 门柱区域
-  const crateBlocked=
-    targetCrateX<180 ||
-    targetCrateX+crate.w>1450 ||
-    (targetCrateX+crate.w>2250 && targetCrateX<2274);
-
-  if(crateBlocked){
-    // 箱子推不动：把玩家吸附回箱子边缘，清除速度，避免抖动
-    if(movedX>0)player.x=crate.x-player.w;
-    else player.x=crate.x+crate.w;
-    player.vx=0;
+  // 「松开」冷却中，或没有垂直重叠：只移动玩家，不推箱
+  if(noPushTimer>0 || !verticalOverlap){
+    player.x=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,oldPlayerX+dx));
     return;
   }
 
-  // 推动成功：箱子移动，玩家同步吸附到箱子边缘
-  crate.x=targetCrateX;
-  if(movedX>0)player.x=crate.x-player.w;
-  else player.x=crate.x+crate.w;
+  // ---- 向右移动 ----
+  if(dx>0){
+    const newRight=oldPlayerRight+dx;
+    // 只有「移动前在箱子左侧、移动后跨入箱子」才推
+    if(oldPlayerRight<=crateLeft+1 && newRight>crateLeft){
+      const overlap=newRight-crateLeft;
+      const targetCrateX=crate.x+overlap;
+      const blocked=
+        targetCrateX<180 ||
+        targetCrateX+crate.w>1450 ||
+        (targetCrateX+crate.w>2250 && targetCrateX<2274);
+      if(blocked){
+        // 箱子推不动：玩家贴着箱子边缘停下
+        player.x=crateLeft-player.w;
+        player.vx=0;
+      }else{
+        crate.x=targetCrateX;
+        player.x=crate.x-player.w;
+        crate.pushFlash=12;
+      }
+      return;
+    }
+  }
+  // ---- 向左移动 ----
+  else{
+    const newLeft=oldPlayerLeft+dx;
+    // 只有「移动前在箱子右侧、移动后跨入箱子」才推
+    if(oldPlayerLeft>=crateRight-1 && newLeft<crateRight){
+      const overlap=crateRight-newLeft;
+      const targetCrateX=crate.x-overlap;
+      const blocked=
+        targetCrateX<180 ||
+        targetCrateX+crate.w>1450 ||
+        (targetCrateX+crate.w>2250 && targetCrateX<2274);
+      if(blocked){
+        player.x=crateRight;
+        player.vx=0;
+      }else{
+        crate.x=targetCrateX;
+        player.x=crate.x+crate.w;
+        crate.pushFlash=12;
+      }
+      return;
+    }
+  }
 
-  // 推动高亮反馈
-  crate.pushFlash=12;
+  // ---- 没有撞上箱子：正常移动 ----
+  player.x=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,oldPlayerX+dx));
+
+  // 兜底：如果移动后仍与箱子水平重叠（异常情况），把玩家分离出去
+  const finalRight=player.x+player.w;
+  const finalLeft=player.x;
+  if(finalRight>crateLeft && finalLeft<crateRight && verticalOverlap){
+    if(oldPlayerX+player.w/2 < crate.x+crate.w/2){
+      player.x=crateLeft-player.w;
+    }else{
+      player.x=crateRight;
+    }
+    player.vx=0;
+  }
+}
+
+/* 主动「松开箱子」：让玩家离开箱子一小段距离，并在 0.5 秒内不推箱 */
+function releaseCrate(){
+  if(state!=="play"||level!==4){
+    say("🖐️ 「松开箱子」只在第四关推箱子时使用。");
+    return;
+  }
+  noPushTimer=0.5;
+  const verticalOverlap=
+    player.y+player.h>crate.y+6 &&
+    player.y<crate.y+crate.h-6;
+  if(verticalOverlap){
+    const pCenter=player.x+player.w/2;
+    const cCenter=crate.x+crate.w/2;
+    if(pCenter<cCenter){
+      player.x=crate.x-player.w-5;
+    }else{
+      player.x=crate.x+crate.w+5;
+    }
+    player.vx=0;
+  }
+  say("🖐️ 已松开箱子！箱子会留在原地，0.5 秒内不会跟着你动。");
 }
 
 function update(dt){
@@ -759,6 +1096,7 @@ function update(dt){
   if(invincible>0)invincible-=dt*60;
   if(attackCooldown>0)attackCooldown-=dt*60;
   if(crate.pushFlash>0)crate.pushFlash-=dt*60;
+  if(noPushTimer>0)noPushTimer-=dt;
 
   // 平滑加速、松手缓停
   const dir=(holding.right?1:0)-(holding.left?1:0);
@@ -796,7 +1134,7 @@ function update(dt){
     if(player.x+player.w>p.x&&player.x<p.x+p.w&&oldBottom<=p.y+10&&player.y+player.h>=p.y&&player.vy>=0)landing=Math.min(landing,p.y);
   });
 
-  // 第四关：箱子顶面可作为落脚点（+18 容差让边缘落地更顺手）
+  // 第四关：箱子顶面可作为落脚点
   if(level===4){
     const onCrate=
       player.x+player.w>crate.x+4 &&
@@ -1199,6 +1537,12 @@ function draw(){
       ctx.strokeRect(crateLeft-3,crateTop-3,crate.w+6,crate.h+6);
       ctx.restore();
     }
+    // 松开冷却提示
+    if(noPushTimer>0){
+      ctx.fillStyle="rgba(183,216,255,.85)";
+      ctx.font="bold 15px Arial";
+      ctx.fillText("🖐️ 箱子已松开",crateLeft-20,crateTop-16);
+    }
     ctx.fillStyle=doorOpen?"#5de49b":"#e45b70";
     ctx.fillRect(sensor.x-scroll,GROUND-12,sensor.w,12);
     ctx.fillStyle="#fff";
@@ -1356,6 +1700,11 @@ bindHold("jump","jump");
 document.getElementById("attack").addEventListener("pointerdown",e=>{
   e.preventDefault();attack();
 });
+/* 新增「🖐️ 松开箱子」按钮 */
+document.getElementById("release").addEventListener("click",e=>{
+  e.preventDefault();
+  releaseCrate();
+});
 window.addEventListener("keydown",e=>{
   if(["ArrowLeft","ArrowRight","ArrowUp","Space"].includes(e.code))e.preventDefault();
   if(e.code==="ArrowLeft"||e.code==="KeyA")holding.left=true;
@@ -1364,6 +1713,7 @@ window.addEventListener("keydown",e=>{
     if(!holding.jump)jump();holding.jump=true;
   }
   if(e.code==="KeyJ")attack();
+  if(e.code==="KeyR")releaseCrate();
   if(e.code==="Escape"&&state==="play"){
     state="paused";previousState="play";showPanel("rulesPanel");
   }
@@ -1480,7 +1830,7 @@ requestAnimationFrame(loop);
   "startAdventure", "welcomeTutorial", "tutorialStart", "welcomeShop", "welcomeDisclaimer",
   "shopBack", "rulesBack", "nextStage", "endingRestart", "endingShop",
   "endingHome", "disclaimerBack", "restart", "shopButton", "rulesButton",
-  "redeem", "disclaimerButton"
+  "redeem", "disclaimerButton", "release"
   ];
   menuButtonIds.forEach(function (id) {
     const element = document.getElementById(id);
