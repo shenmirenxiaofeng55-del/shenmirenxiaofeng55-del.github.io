@@ -267,275 +267,6 @@ button:focus-visible, input:focus-visible {
   color: #d4e3f4;
 }
 #overlay {
-  backdrop-filter: b<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🍡 团子冒险世界</title>
-<style>
-*{
-  box-sizing:border-box
-}
-:root{
-  --mint:#a9f0d0;
-  --deep:#11172b;
-  --panel:#26344f
-}
-body{
-  margin:0;
-  padding:12px;
-  text-align:center;
-  background:var(--deep);
-  color:white;
-  font-family:Arial,system-ui,sans-serif
-}
-h1{
-  color:var(--mint);
-  margin:8px
-}
-.info{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:8px;
-  margin:12px
-}
-.info span{
-  background:#27334e;
-  padding:9px 12px;
-  border-radius:12px;
-  font-weight:bold
-}
-canvas{
-  display:block;
-  width:100%;
-  max-width:960px;
-  height:auto;
-  margin:auto;
-  border:3px solid white;
-  border-radius:15px;
-  background:#9be7f5;
-  touch-action:none
-}
-button{
-  border:0;
-  border-radius:11px;
-  padding:12px 16px;
-  margin:5px;
-  font-weight:bold;
-  font-size:15px;
-  background:var(--mint);
-  color:#17352c;
-  cursor:pointer;
-  touch-action:manipulation
-}
-button:active{
-  transform:scale(.96)
-}
-button:disabled{
-  opacity:.55
-}
-#overlay{
-  position:fixed;
-  inset:0;
-  z-index:20;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:15px;
-  background:#10172bee
-}
-.panel{
-  width:min(470px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:var(--panel);
-  border:2px solid #9ee8cf;
-  border-radius:22px;
-  padding:22px;
-  box-shadow:0 15px 50px #0008
-}
-.panel h2{
-  color:var(--mint)
-}
-.panel p{
-  line-height:1.7
-}
-.hidden{
-  display:none!important
-}
-.big{
-  font-size:65px
-}
-#msg{
-  color:#ffe49b;
-  min-height:24px
-}
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  margin:12px auto;
-  max-width:500px
-}
-.controls button{
-  width:85px;
-  height:65px;
-  font-size:25px;
-  touch-action:none;
-  user-select:none;
-  -webkit-user-select:none
-}
-#jump{
-  background:#ffd166
-}
-#attack{
-  background:#ffb3a7
-}
-#release{
-  background:#b7d8ff
-}
-#shopItems{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px
-}
-.shopItem{
-  background:#344461;
-  padding:12px;
-  border-radius:12px
-}
-.shopItem button{
-  font-size:13px
-}
-footer{
-  margin:25px auto;
-  color:#aebbd0;
-  font-size:12px;
-  line-height:1.8
-}
-.small{
-  font-size:12px;
-  color:#b9c6db
-}
-input{
-  width:130px;
-  padding:11px;
-  border-radius:10px;
-  border:1px solid #9ee8cf;
-  background:#17243b;
-  color:white
-}
-@media(max-width:520px){
-  body{
-    padding:7px
-  }
-  .controls button{
-    width:76px;
-    height:62px
-  }
-  .panel{
-    padding:17px
-  }
-}
-/* ===== 精致界面增强 ===== */
-:root {
-  --mint: #a9f0d0;
-  --mint-bright: #c8ffe8;
-  --gold: #ffd166;
-  --coral: #ff9e9e;
-  --deep: #10182c;
-  --panel: #263650;
-}
-body {
-  min-height: 100vh;
-  background:
-  radial-gradient(circle at 12% 8%, rgba(95, 190, 169, .16), transparent 28%),
-  radial-gradient(circle at 88% 18%, rgba(109, 145, 220, .15), transparent 30%),
-  linear-gradient(145deg, #10182c, #17243b 55%, #10182c);
-}
-h1 {
-  text-shadow: 0 3px 18px rgba(119, 255, 211, .22);
-  letter-spacing: 1px;
-}
-.info span {
-  border: 1px solid rgba(184, 255, 225, .16);
-  box-shadow: 0 5px 16px rgba(0, 0, 0, .16);
-  backdrop-filter: blur(8px);
-}
-canvas {
-  box-shadow: 0 18px 55px rgba(0, 0, 0, .34), 0 0 0 1px rgba(205,255,236,.16);
-}
-button {
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 5px 0 rgba(0, 0, 0, .16), 0 8px 20px rgba(0,0,0,.12);
-  transition: transform .14s ease, filter .14s ease, box-shadow .14s ease;
-}
-button:hover {
-  filter: brightness(1.07);
-  transform: translateY(-1px);
-}
-button:active {
-  transform: translateY(2px) scale(.98);
-  box-shadow: 0 2px 0 rgba(0,0,0,.16);
-}
-button:focus-visible, input:focus-visible {
-  outline: 3px solid #fff0a8;
-  outline-offset: 3px;
-}
-#left, #right {
-  background: linear-gradient(180deg, #b8f4dc, #7dd9b7);
-}
-#jump {
-  background: linear-gradient(180deg, #ffe59b, #ffc64e);
-}
-#attack {
-  background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
-}
-#release {
-  background: linear-gradient(180deg, #cfe4ff, #9cc4ff);
-}
-#msg {
-  padding: 8px 12px;
-  margin: 7px auto;
-  width: min(960px, 96%);
-  border: 1px solid rgba(255, 226, 154, .15);
-  border-radius: 12px;
-  background: rgba(31, 45, 68, .55);
-}
-.panel {
-  background:
-  radial-gradient(circle at 100% 0%, rgba(169,240,208,.12), transparent 35%),
-  linear-gradient(145deg, #2b3c59, #202d46);
-  border: 1px solid rgba(195,255,231,.55);
-  box-shadow: 0 25px 80px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.08);
-  animation: panelIn .22s ease-out;
-}
-@keyframes panelIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.panel h2 {
-  text-shadow: 0 2px 14px rgba(169,240,208,.16);
-}
-.shopItem {
-  border: 1px solid rgba(196,255,230,.12);
-  background: linear-gradient(145deg, #3b506f, #2c3e5b);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-}
-.shopItem p {
-  color: #d4e3f4;
-}
-#overlay {
   backdrop-filter: blur(8px);
 }
 footer {
@@ -619,6 +350,7 @@ footer {
   <h2>📖 游戏规则</h2>
   <p>❤️ 三条生命；⬅️➡️ 自由移动；⬆️ 跳跃和飞行；🐙 章鱼会移动并喷墨；🪙 收集金币购买装扮；第四关推箱子解谜；第五关挑战邪恶团子。</p>
   <p>第四关小提示：推箱子时如果不想再推了，点击「🖐️ 松开箱子」按钮，箱子会留在原地。</p>
+  <p>第四关小提示：把箱子推到尖刺上，尖刺会暂时失效 3 秒，趁着失效时间快速通过！</p>
   <button id="rulesBack">返回</button>
  </div>
  <div class="panel hidden" id="stagePanel">
@@ -782,8 +514,9 @@ function makeLevel(){
     for(let i=0;i<13;i++)gold.push({
       x:220+i*115,y:GROUND-48,got:false
     });
+    /* 尖刺新增 disabledTimer：箱子压上去时尖刺暂时失效 */
     obstacles=[{
-      x:850,w:50,h:42,type:"spike",moving:false,phase:0
+      x:850,w:50,h:42,type:"spike",moving:false,phase:0,disabledTimer:0
     }
     ];
   }
@@ -823,7 +556,7 @@ function startNext(){
     state="play";
     makeLevel();
     closePanel();
-    say("进入第"+level+"关！");
+    say("进入第"+level+"关！"+(level===4?"把箱子推到尖刺上，尖刺会暂时失效！":""));
   }
   else finishGame(true);
 }
@@ -962,22 +695,12 @@ function rectHit(a,b){
 }
 
 /* ============================================================
-   第四关推箱子：修复「箱子粘着团子」的核心逻辑
+   第四关推箱子：标准 Sokoban 式“侧向接触”推动
    ------------------------------------------------------------
-   旧版的致命 bug：
-     向左移动时用 overlap=(crate.x+crate.w)-player.x 计算穿透深度，
-     这个值在「玩家位于箱子左侧」时也是正数，
-     于是玩家往左走反而把箱子往左拉，箱子就永远粘在玩家身上。
-
-   现在的判定（标准 Sokoban 侧向接触模型）：
-     只有当「玩家移动前在箱子一侧、移动后跨入箱子」时才推箱。
-     · 向右移动：移动前玩家右缘 <= 箱子左缘(+1 容差)，移动后右缘 > 箱子左缘
-     · 向左移动：移动前玩家左缘 >= 箱子右缘(-1 容差)，移动后左缘 < 箱子右缘
-     其它情况（玩家远离箱子、玩家在箱子另一侧、玩家站箱顶）一律不推箱。
-     这样玩家向左走不会再拖动箱子。
-
-   另外新增 noPushTimer：按下「🖐️ 松开箱子」后 0.5 秒内完全禁用推箱，
-   给玩家一个主动「放下箱子」的操作。
+   只在这两种情况下推动箱子：
+     · 向右：移动前玩家右缘 <= 箱子左缘(+1)，移动后右缘 > 箱子左缘
+     · 向左：移动前玩家左缘 >= 箱子右缘(-1)，移动后左缘 < 箱子右缘
+   其它情况（远离、站箱顶、在另一侧）一律不推，避免箱子粘人。
    ============================================================ */
 function tryPushCrate(dt){
   if(level!==4)return;
@@ -1158,17 +881,38 @@ function update(dt){
 
   scroll=Math.max(level===4?-500:0,Math.min(LEVEL_LENGTH-W,player.x-270));
 
-  // 陷阱
+  // ============================================================
+  // 陷阱 + 尖刺失效机制
+  // 当箱子压到尖刺上时，尖刺立即失效 3 秒（每帧接触都刷新倒计时），
+  // 团子推箱经过或随后走过都不会受伤，箱子也不会卡住。
+  // ============================================================
   obstacles.forEach(o=>{
     let y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
-    const bx=o.x-scroll;
+
+    // 尖刺失效计时器（第四关箱子压住时刷新）
+    if(typeof o.disabledTimer!=="number")o.disabledTimer=0;
+
+    if(level===4 && o.type==="spike"){
+      const crateOverlapX = crate.x < o.x+o.w && crate.x+crate.w > o.x;
+      const crateOnGround = Math.abs(crate.y - (GROUND-crate.h)) < 8;
+      if(crateOverlapX && crateOnGround){
+        // 箱子正压在尖刺上：刷新失效倒计时为 3 秒
+        o.disabledTimer = 3.0;
+      }
+    }
+    if(o.disabledTimer>0)o.disabledTimer-=dt;
+
     if(o.type==="spike"){
-      const crateCoversSpike=level===4 &&
-        crate.x<o.x+o.w+crate.w*0.15 &&
-        crate.x+crate.w>o.x-o.w*0.15;
-      if(!crateCoversSpike &&
-         player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&
-         player.y+player.h>y+12)hit();
+      if(o.disabledTimer>0){
+        // 尖刺失效中：完全不造成伤害
+      }else{
+        const crateCoversSpike=level===4 &&
+          crate.x<o.x+o.w+crate.w*0.15 &&
+          crate.x+crate.w>o.x-o.w*0.15;
+        if(!crateCoversSpike &&
+           player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&
+           player.y+player.h>y+12)hit();
+      }
     }else if(rectHit({
       x:player.x,y:player.y,w:player.w,h:player.h
     },{
@@ -1226,9 +970,6 @@ function update(dt){
 
   // ============================================================
   // 第五关 Boss：更长前摇 + 强化技能
-  // 设计思路：所有技能发动前先进入“预警阶段”（telegraph），
-  // 让玩家能看清并反应；预警结束后才真正释放技能。
-  // 前摇越长，技能威胁相应增强，符合“强力攻击需要更长前摇”的原则。
   // ============================================================
   if(level===5&&boss.hp>0){
     boss.attackTimer-=dt;
@@ -1499,13 +1240,41 @@ function draw(){
   platforms.forEach(p=>{
     ctx.fillStyle="#b78354";ctx.fillRect(p.x-scroll,p.y,p.w,p.h);ctx.fillStyle="#7bd28e";ctx.fillRect(p.x-scroll,p.y,p.w,6);
   });
+
+  // ============================================================
+  // 绘制障碍物 + 尖刺失效视觉反馈
+  // ============================================================
   obstacles.forEach(o=>{
-    let x=o.x-scroll,y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);if(o.type==="spike"){
-      ctx.fillStyle="#ed4769";ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
+    let x=o.x-scroll,y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
+    if(o.type==="spike"){
+      if(o.disabledTimer>0){
+        // 失效的尖刺：灰色半透明 + 倒计时
+        ctx.save();
+        ctx.globalAlpha=0.45;
+        ctx.fillStyle="#9aa6b8";
+        ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
+        ctx.restore();
+        // 失效光晕
+        ctx.save();
+        ctx.globalAlpha=0.25+Math.sin(frame*.15)*.10;
+        ctx.fillStyle="#c8ffe8";
+        ctx.beginPath();ctx.ellipse(x+o.w/2,GROUND-6,o.w*0.75,14,0,0,7);ctx.fill();
+        ctx.restore();
+        // 倒计时文字
+        ctx.fillStyle="#c8ffe8";
+        ctx.font="bold 12px Arial";
+        ctx.textAlign="center";
+        ctx.fillText("尖刺失效 "+o.disabledTimer.toFixed(1)+"s",x+o.w/2,y-8);
+        ctx.textAlign="left";
+      }else{
+        ctx.fillStyle="#ed4769";
+        ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
+      }
     }else{
       ctx.fillStyle="#dc783e";ctx.fillRect(x,y,o.w,o.h);
     }
   });
+
   gold.forEach(c=>{
     if(!c.got)drawCoin(c);
   });
@@ -1700,7 +1469,7 @@ bindHold("jump","jump");
 document.getElementById("attack").addEventListener("pointerdown",e=>{
   e.preventDefault();attack();
 });
-/* 新增「🖐️ 松开箱子」按钮 */
+/* 「🖐️ 松开箱子」按钮 */
 document.getElementById("release").addEventListener("click",e=>{
   e.preventDefault();
   releaseCrate();
