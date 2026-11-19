@@ -394,7 +394,7 @@ let player={
 ;
 let obstacles=[],gold=[],octopus=[],ink=[],platforms=[];
 let crate={
-  x:450,y:GROUND-54,w:54,h:54
+  x:450,y:GROUND-54,w:54,h:54,pushFlash:0
 }
 ,sensor={
   x:1180,w:92
@@ -492,7 +492,7 @@ function makeLevel(){
   if(level===4){
     // 第四关：谜题场景，彩蛋宝箱在出生点后方
     crate={
-      x:480,y:GROUND-54,w:54,h:54
+      x:480,y:GROUND-54,w:54,h:54,pushFlash:0
     }
     ;
     sensor={
@@ -682,80 +682,74 @@ function rectHit(a,b){
 }
 
 /* ============================================================
-   第四关推箱子：稳健推动逻辑
-   核心原则（参考 Sokoban 通用碰撞规则）：
-   1. 玩家水平移动前，先预判「玩家新位置」和「箱子新位置」。
-   2. 如果箱子新位置会越界、会与传感器/门柱区域重叠，则整个移动取消，
-      玩家和箱子都回退到移动前的位置。
-   3. 只有箱子新位置合法时，才同时移动玩家和箱子。
-   4. 垂直方向单独处理：玩家可以站在箱子上，但不能从侧面“嵌”入箱子。
+   第四关推箱子：标准 Sokoban 式“穿透深度推动”
+   ------------------------------------------------------------
+   之前版本的错误做法：
+     先移动玩家，再根据重叠“顺手”修改玩家 y 坐标做垂直分离，
+     结果玩家站地面推箱时被错误吸附到箱顶，箱子就再也推不动。
+
+   现在的做法（参考开源推箱子实现思路）：
+     1. 只处理水平轴：先按 vx 计算玩家的目标 x。
+     2. 判断玩家与箱子是否有“真正的侧面重叠”（排除站在箱顶）。
+     3. 若重叠，穿透深度 overlap 就是箱子应被推开的距离。
+     4. 检查箱子目标位置是否越界/撞门柱；撞了就只把玩家吸附回箱子边缘。
+     5. 推动成功时箱子移动 overlap，玩家吸附到箱子边缘，消除浮点残差。
+     6. 本函数绝不修改 player.y / player.vy，垂直落地完全交给 update 的
+        landing 逻辑处理，因此不会再出现“瞬移到箱顶”的问题。
    ============================================================ */
 function tryPushCrate(dt){
   if(level!==4)return;
+
+  const dx=player.vx*dt*60;
+  if(Math.abs(dx)<0.0001)return;
+
   const oldPlayerX=player.x;
-  const oldCrateX=crate.x;
-  const proposedPlayerX=oldPlayerX+player.vx*dt*60;
 
-  // 先做常规边界 clamp（玩家自身不能出界）
-  let nextPlayerX=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,proposedPlayerX));
-  const dx=nextPlayerX-oldPlayerX;
-  if(Math.abs(dx)<0.001){
-    return; // 没有实际水平移动，不需要推箱子
-  }
+  // 先按水平速度移动玩家，并做场地边界 clamp
+  player.x=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,player.x+dx));
+  const movedX=player.x-oldPlayerX;
+  if(Math.abs(movedX)<0.0001)return;
 
-  // 判断玩家是否与箱子在垂直方向重叠（只有重叠时才可能推动）
+  // 玩家站在箱顶时不参与水平推箱：
+  // 底部必须明显低于箱顶（+6 容差），顶部必须高于箱底（-6 容差）
   const verticalOverlap=
-    player.y+player.h>crate.y+4 &&
-    player.y<crate.y+crate.h-4;
-  if(!verticalOverlap){
-    player.x=nextPlayerX;
-    return;
+    player.y+player.h>crate.y+6 &&
+    player.y<crate.y+crate.h-6;
+  if(!verticalOverlap)return;
+
+  // 计算玩家与箱子的水平穿透深度
+  let overlap=0;
+  if(movedX>0){
+    overlap=(player.x+player.w)-crate.x;
+  }else{
+    overlap=(crate.x+crate.w)-player.x;
   }
+  if(overlap<=0)return; // 只是靠近，还没有真正接触
 
-  const playerRight=nextPlayerX+player.w;
-  const playerLeft=nextPlayerX;
-  const crateLeft=crate.x;
-  const crateRight=crate.x+crate.w;
+  // 箱子需要被推开的距离 = 穿透深度
+  const targetCrateX=movedX>0?crate.x+overlap:crate.x-overlap;
 
-  // 判断是否发生水平接触
-  const touchingRight=dx>0 && playerRight>crateLeft && playerLeft<crateRight;
-  const touchingLeft=dx<0 && playerLeft<crateRight && playerRight>crateLeft;
-  if(!touchingRight && !touchingLeft){
-    player.x=nextPlayerX;
-    return;
-  }
-
-  // 计算箱子的目标位置（与玩家位移量相同）
-  const proposedCrateX=oldCrateX+dx;
-
-  // 检查箱子目标位置是否合法
+  // 箱子目标位置合法性：场地边界 + 门柱区域
   const crateBlocked=
-    proposedCrateX<180 ||
-    proposedCrateX+crate.w>1450 ||
-    // 门柱区域不允许箱子进入
-    (proposedCrateX+crate.w>2180 && proposedCrateX<2250+24) ||
-    // 与传感器本身的实体部分重叠（传感器是可推动目标，但箱子不能陷进去）
-    false; // 传感器允许被压住，不阻挡箱子
+    targetCrateX<180 ||
+    targetCrateX+crate.w>1450 ||
+    (targetCrateX+crate.w>2250 && targetCrateX<2274);
 
   if(crateBlocked){
-    // 箱子动不了：玩家也回退，不产生重叠
-    player.x=oldPlayerX;
+    // 箱子推不动：把玩家吸附回箱子边缘，清除速度，避免抖动
+    if(movedX>0)player.x=crate.x-player.w;
+    else player.x=crate.x+crate.w;
     player.vx=0;
     return;
   }
 
-  // 合法：同时移动玩家和箱子
-  crate.x=proposedCrateX;
-  player.x=nextPlayerX;
+  // 推动成功：箱子移动，玩家同步吸附到箱子边缘
+  crate.x=targetCrateX;
+  if(movedX>0)player.x=crate.x-player.w;
+  else player.x=crate.x+crate.w;
 
-  // 水平推完后立即做一次垂直分离，防止玩家在跳跃下落过程中嵌入箱子侧面
-  if(player.y+player.h>crate.y && player.y<crate.y+crate.h){
-    if(player.vy>0 && oldPlayerX+player.w<=crate.x+6){
-      player.y=crate.y-player.h;
-      player.vy=0;
-      player.onGround=true;
-    }
-  }
+  // 推动高亮反馈
+  crate.pushFlash=12;
 }
 
 function update(dt){
@@ -764,6 +758,8 @@ function update(dt){
   frame+=dt*60;
   if(invincible>0)invincible-=dt*60;
   if(attackCooldown>0)attackCooldown-=dt*60;
+  if(crate.pushFlash>0)crate.pushFlash-=dt*60;
+
   // 平滑加速、松手缓停
   const dir=(holding.right?1:0)-(holding.left?1:0);
   const maxSpeed=fuel>0?5.0:4.2;
@@ -800,12 +796,12 @@ function update(dt){
     if(player.x+player.w>p.x&&player.x<p.x+p.w&&oldBottom<=p.y+10&&player.y+player.h>=p.y&&player.vy>=0)landing=Math.min(landing,p.y);
   });
 
-  // 第四关：箱子顶面可作为落脚点
+  // 第四关：箱子顶面可作为落脚点（+18 容差让边缘落地更顺手）
   if(level===4){
     const onCrate=
       player.x+player.w>crate.x+4 &&
       player.x<crate.x+crate.w-4 &&
-      oldBottom<=crate.y+12 &&
+      oldBottom<=crate.y+18 &&
       player.y+player.h>=crate.y &&
       player.vy>=0;
     if(onCrate)landing=Math.min(landing,crate.y);
@@ -1181,17 +1177,28 @@ function draw(){
   });
   if(level===4){
     // 箱子和传感器
+    const crateLeft=crate.x-scroll;
+    const crateTop=GROUND-crate.h;
     ctx.fillStyle="#c18a4c";
-    ctx.fillRect(crate.x-scroll,GROUND-crate.h,crate.w,crate.h);
+    ctx.fillRect(crateLeft,crateTop,crate.w,crate.h);
     ctx.strokeStyle="#744a28";
     ctx.lineWidth=4;
-    ctx.strokeRect(crate.x-scroll,GROUND-crate.h,crate.w,crate.h);
+    ctx.strokeRect(crateLeft,crateTop,crate.w,crate.h);
     ctx.beginPath();
-    ctx.moveTo(crate.x-scroll+7,GROUND-7);
-    ctx.lineTo(crate.x-scroll+crate.w-7,GROUND-crate.h+7);
-    ctx.moveTo(crate.x-scroll+crate.w-7,GROUND-7);
-    ctx.lineTo(crate.x-scroll+7,GROUND-crate.h+7);
+    ctx.moveTo(crateLeft+7,GROUND-7);
+    ctx.lineTo(crateLeft+crate.w-7,crateTop+7);
+    ctx.moveTo(crateLeft+crate.w-7,GROUND-7);
+    ctx.lineTo(crateLeft+7,crateTop+7);
     ctx.stroke();
+    // 推动瞬间的高亮反馈：让玩家确认箱子确实被推动了
+    if(crate.pushFlash>0){
+      ctx.save();
+      ctx.globalAlpha=Math.min(1,crate.pushFlash/12);
+      ctx.strokeStyle="#fff0a8";
+      ctx.lineWidth=3;
+      ctx.strokeRect(crateLeft-3,crateTop-3,crate.w+6,crate.h+6);
+      ctx.restore();
+    }
     ctx.fillStyle=doorOpen?"#5de49b":"#e45b70";
     ctx.fillRect(sensor.x-scroll,GROUND-12,sensor.w,12);
     ctx.fillStyle="#fff";
