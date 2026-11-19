@@ -402,7 +402,8 @@ let crate={
 ;
 let doorOpen=false,chestOpened=localStorage.getItem("tuanziChestOpened")==="yes";
 let boss={
-  x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
+  x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0,
+  telegraph:0,telegraphKind:"",telegraphDir:1
 }
 ;
 let bossProjectiles=[],attackCooldown=0,toastFrames=0;
@@ -508,7 +509,8 @@ function makeLevel(){
   }
   if(level===5){
     boss={
-      x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
+      x:2100,y:GROUND-146,hp:300,maxHp:300,attackTimer:1.15,flash:0,skillTimer:3.2,charge:0,chargeDir:-1,phase:0,
+      telegraph:0,telegraphKind:"",telegraphDir:1
     }
     ;
     for(let i=0;i<10;i++)gold.push({
@@ -678,6 +680,84 @@ function attack(){
 function rectHit(a,b){
   return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 }
+
+/* ============================================================
+   第四关推箱子：稳健推动逻辑
+   核心原则（参考 Sokoban 通用碰撞规则）：
+   1. 玩家水平移动前，先预判「玩家新位置」和「箱子新位置」。
+   2. 如果箱子新位置会越界、会与传感器/门柱区域重叠，则整个移动取消，
+      玩家和箱子都回退到移动前的位置。
+   3. 只有箱子新位置合法时，才同时移动玩家和箱子。
+   4. 垂直方向单独处理：玩家可以站在箱子上，但不能从侧面“嵌”入箱子。
+   ============================================================ */
+function tryPushCrate(dt){
+  if(level!==4)return;
+  const oldPlayerX=player.x;
+  const oldCrateX=crate.x;
+  const proposedPlayerX=oldPlayerX+player.vx*dt*60;
+
+  // 先做常规边界 clamp（玩家自身不能出界）
+  let nextPlayerX=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,proposedPlayerX));
+  const dx=nextPlayerX-oldPlayerX;
+  if(Math.abs(dx)<0.001){
+    return; // 没有实际水平移动，不需要推箱子
+  }
+
+  // 判断玩家是否与箱子在垂直方向重叠（只有重叠时才可能推动）
+  const verticalOverlap=
+    player.y+player.h>crate.y+4 &&
+    player.y<crate.y+crate.h-4;
+  if(!verticalOverlap){
+    player.x=nextPlayerX;
+    return;
+  }
+
+  const playerRight=nextPlayerX+player.w;
+  const playerLeft=nextPlayerX;
+  const crateLeft=crate.x;
+  const crateRight=crate.x+crate.w;
+
+  // 判断是否发生水平接触
+  const touchingRight=dx>0 && playerRight>crateLeft && playerLeft<crateRight;
+  const touchingLeft=dx<0 && playerLeft<crateRight && playerRight>crateLeft;
+  if(!touchingRight && !touchingLeft){
+    player.x=nextPlayerX;
+    return;
+  }
+
+  // 计算箱子的目标位置（与玩家位移量相同）
+  const proposedCrateX=oldCrateX+dx;
+
+  // 检查箱子目标位置是否合法
+  const crateBlocked=
+    proposedCrateX<180 ||
+    proposedCrateX+crate.w>1450 ||
+    // 门柱区域不允许箱子进入
+    (proposedCrateX+crate.w>2180 && proposedCrateX<2250+24) ||
+    // 与传感器本身的实体部分重叠（传感器是可推动目标，但箱子不能陷进去）
+    false; // 传感器允许被压住，不阻挡箱子
+
+  if(crateBlocked){
+    // 箱子动不了：玩家也回退，不产生重叠
+    player.x=oldPlayerX;
+    player.vx=0;
+    return;
+  }
+
+  // 合法：同时移动玩家和箱子
+  crate.x=proposedCrateX;
+  player.x=nextPlayerX;
+
+  // 水平推完后立即做一次垂直分离，防止玩家在跳跃下落过程中嵌入箱子侧面
+  if(player.y+player.h>crate.y && player.y<crate.y+crate.h){
+    if(player.vy>0 && oldPlayerX+player.w<=crate.x+6){
+      player.y=crate.y-player.h;
+      player.vy=0;
+      player.onGround=true;
+    }
+  }
+}
+
 function update(dt){
   if(state!=="play")return;
   dt=Math.min(dt,.035);
@@ -693,6 +773,7 @@ function update(dt){
   }
   else player.vx*=Math.pow(.78,dt*60);
   player.vx=Math.max(-maxSpeed,Math.min(maxSpeed,player.vx));
+
   // 跳跃与火箭背包：推力渐进，松开后自然下落
   if(holding.jump&&fuel>0){
     player.vy-=.43*dt*60;
@@ -701,30 +782,16 @@ function update(dt){
   }
   player.vy+=.42*dt*60;
   player.vy=Math.min(player.vy,10);
-  const previousX=player.x;
-  player.x+=player.vx*dt*60;
-  player.x=Math.max(level===4?-470:0,Math.min(LEVEL_LENGTH-player.w,player.x));
+
+  // ---- 水平移动 + 第四关推箱子 ----
   if(level===4){
-    const boxLeft=crate.x;
-    const boxRight=crate.x+crate.w;
-    const nextRight=player.x+player.w;
-    const nextLeft=player.x;
-    const verticalTouch=player.y+player.h>GROUND-crate.h+5;
-    if(verticalTouch && nextRight>boxLeft && nextLeft<boxRight){
-      if(player.vx>0 && previousX+player.w<=boxLeft+4){
-        crate.x+=player.x-previousX;
-        player.x=crate.x-player.w;
-      }
-      else if(player.vx<0 && previousX>=boxRight-4){
-        crate.x+=player.x-previousX;
-        player.x=crate.x+crate.w;
-      }
-      else{
-        player.x=previousX;
-        player.vx=0;
-      }
-    }
+    tryPushCrate(dt);
+  }else{
+    player.x+=player.vx*dt*60;
+    player.x=Math.max(0,Math.min(LEVEL_LENGTH-player.w,player.x));
   }
+
+  // ---- 垂直移动 ----
   const oldBottom=player.y+player.h;
   player.y+=player.vy*dt*60;
   player.onGround=false;
@@ -732,16 +799,31 @@ function update(dt){
   platforms.forEach(p=>{
     if(player.x+player.w>p.x&&player.x<p.x+p.w&&oldBottom<=p.y+10&&player.y+player.h>=p.y&&player.vy>=0)landing=Math.min(landing,p.y);
   });
+
+  // 第四关：箱子顶面可作为落脚点
+  if(level===4){
+    const onCrate=
+      player.x+player.w>crate.x+4 &&
+      player.x<crate.x+crate.w-4 &&
+      oldBottom<=crate.y+12 &&
+      player.y+player.h>=crate.y &&
+      player.vy>=0;
+    if(onCrate)landing=Math.min(landing,crate.y);
+  }
+
   if(player.y+player.h>=landing){
     player.y=landing-player.h;
     player.vy=0;
     player.onGround=true;
   }
+
   // 火箭背包可重复使用：落地后自动缓慢充能
   if(cheated&&player.onGround){
     fuel=Math.min(MAX_FUEL,fuel+2.4*dt*60);
   }
+
   scroll=Math.max(level===4?-500:0,Math.min(LEVEL_LENGTH-W,player.x-270));
+
   // 陷阱
   obstacles.forEach(o=>{
     let y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
@@ -759,6 +841,7 @@ function update(dt){
       x:o.x,y,w:o.w,h:o.h
     }))hit();
   });
+
   // 章鱼及墨汁
   octopus.forEach(o=>{
     const y=o.baseY+Math.sin(frame*.035+o.phase)*29;
@@ -777,7 +860,8 @@ function update(dt){
     }
   });
   ink=ink.filter(b=>b.x>scroll-100&&b.x<scroll+W+100);
-  // 金币拾取，碰撞范围稍宽松，金币位置低且易拿
+
+  // 金币拾取
   gold.forEach(c=>{
     if(c.got)return;
     const dx=player.x+player.w/2-c.x,dy=player.y+player.h/2-c.y;
@@ -785,11 +869,12 @@ function update(dt){
       c.got=true;coins++;saveData();updateUI();say("🪙 收到金币！");
     }
   });
+
   // 第四关：箱子推向传感器
   if(level===4){
     crate.x=Math.max(180,Math.min(1450,crate.x));
     doorOpen=crate.x+crate.w>sensor.x+5&&crate.x<sensor.x+sensor.w+crate.w-5;
-    // 出生点后方彩蛋箱：需要往左走到 x< -85
+
     if(!chestOpened&&player.x<-300){
       chestOpened=true;
       hasOnion=true;
@@ -804,60 +889,119 @@ function update(dt){
     }
     if(player.x>=LEVEL_LENGTH-110&&doorOpen)completeStage();
   }
-  // 第五关 Boss：三种技能轮换，攻击前有短暂预警
+
+  // ============================================================
+  // 第五关 Boss：更长前摇 + 强化技能
+  // 设计思路：所有技能发动前先进入“预警阶段”（telegraph），
+  // 让玩家能看清并反应；预警结束后才真正释放技能。
+  // 前摇越长，技能威胁相应增强，符合“强力攻击需要更长前摇”的原则。
+  // ============================================================
   if(level===5&&boss.hp>0){
     boss.attackTimer-=dt;
     boss.skillTimer-=dt;
     boss.phase+=dt*2.2;
-    if(boss.charge>0){
+
+    // ---- 前摇阶段 ----
+    if(boss.telegraph>0){
+      boss.telegraph-=dt;
+      if(boss.telegraph<=0){
+        // 前摇结束，释放对应技能
+        if(boss.telegraphKind==="fire"){
+          const baseX=boss.x+62, baseY=GROUND-85;
+          for(let i=0;i<5;i++){
+            const angle=-0.42+i*0.21;
+            const speed=310+Math.abs(i-2)*30;
+            bossProjectiles.push({
+              x:baseX,y:baseY+i*17,
+              vx:Math.cos(angle)*speed,
+              vy:Math.sin(angle)*speed*.32+i*42,
+              life:5.0,r:13,kind:"fire"
+            });
+          }
+          say("🔥 五连暗影火球！");
+        }else if(boss.telegraphKind==="wave"){
+          bossProjectiles.push({
+            x:boss.x-80,y:GROUND-15,vx:-420,vy:0,life:5.2,r:22,kind:"wave"
+          });
+          bossProjectiles.push({
+            x:boss.x+140,y:GROUND-15,vx:420,vy:0,life:5.2,r:22,kind:"wave"
+          });
+          say("⚡ 双向地面冲击波！必须跳起来躲开！");
+        }else if(boss.telegraphKind==="charge"){
+          boss.charge=0.92;
+          boss.chargeDir=boss.telegraphDir;
+          say("💢 邪恶团子冲锋！");
+        }
+        boss.telegraphKind="";
+        boss.telegraph=0;
+        boss.skillTimer=3.8+Math.random()*1.2;
+      }
+    }
+    // ---- 冲锋执行 ----
+    else if(boss.charge>0){
       boss.charge-=dt;
-      boss.x+=boss.chargeDir*520*dt;
-      if(Math.abs(player.x-boss.x)<92 && player.y+player.h>GROUND-125)hit();
+      boss.x+=boss.chargeDir*560*dt;
+      if(Math.abs(player.x-boss.x)<98 && player.y+player.h>GROUND-130)hit();
       if(boss.charge<=0){
         boss.x=Math.max(520,Math.min(LEVEL_LENGTH-420,boss.x));
-        boss.attackTimer=0.65;
+        boss.attackTimer=0.75;
       }
-    }else if(boss.skillTimer<=0){
+    }
+    // ---- 选择下一个技能并进入前摇 ----
+    else if(boss.skillTimer<=0){
       const roll=Math.floor(Math.random()*3);
       if(roll===0){
-        for(let i=-1;i<=1;i++){
-          const dx=(player.x+player.w/2)-(boss.x+62);
-          bossProjectiles.push({
-            x:boss.x+62,y:GROUND-80+i*23,
-            vx:Math.sign(dx||-1)*(260+Math.abs(i)*35),
-            vy:i*75,life:4.2,r:14,kind:"fire"
-          });
-        }
-        say("🔥 邪恶团子：三连暗影火球！");
+        boss.telegraph=1.55;
+        boss.telegraphKind="fire";
+        say("⚠ 邪恶团子正在凝聚暗影火球……");
       }else if(roll===1){
-        bossProjectiles.push({
-          x:boss.x-80,y:GROUND-15,vx:player.x<boss.x?-360:360,
-          vy:0,life:4.5,r:20,kind:"wave"
-        });
-        say("⚡ 地面冲击波！跳起来躲开！");
+        boss.telegraph=1.35;
+        boss.telegraphKind="wave";
+        say("⚠ 地面开始震动！冲击波即将来袭！");
       }else{
-        boss.charge=0.72;
-        boss.chargeDir=player.x<boss.x?-1:1;
-        say("💢 邪恶团子正在蓄力冲锋！快躲开！");
+        boss.telegraph=1.75;
+        boss.telegraphKind="charge";
+        boss.telegraphDir=player.x<boss.x?-1:1;
+        say("⚠ 邪恶团子压低身体，准备冲锋！");
       }
-      boss.skillTimer=3.4+Math.random()*1.0;
     }
+
+    // ---- 弹幕更新 ----
     bossProjectiles.forEach(p=>{
       p.x+=p.vx*dt;
       p.y+=(p.vy||0)*dt;
+      if(p.kind==="fire"){
+        // 火球轻微追踪玩家，但前摇足够长，可以横向跑开
+        const targetX=player.x+player.w/2;
+        const targetY=player.y+player.h/2;
+        const dx=targetX-p.x, dy=targetY-p.y;
+        const dist=Math.hypot(dx,dy)||1;
+        const steer=68;
+        p.vx+=dx/dist*steer*dt;
+        p.vy+=dy/dist*steer*dt;
+        const sp=Math.hypot(p.vx,p.vy);
+        const cap=380;
+        if(sp>cap){
+          p.vx=p.vx/sp*cap;
+          p.vy=p.vy/sp*cap;
+        }
+      }
       p.life-=dt;
       const hitX=Math.abs(player.x+player.w/2-p.x)<(p.r||14)+22;
       const hitY=Math.abs(player.y+player.h/2-p.y)<(p.r||14)+27;
       if(hitX&&hitY){
-        if(p.kind==="wave" && player.y+player.h<GROUND-22){
+        if(p.kind==="wave" && player.y+player.h<GROUND-26){
           // 跳过冲击波
         }else hit();
         p.life=0;
       }
     });
     bossProjectiles=bossProjectiles.filter(p=>p.life>0);
+
+    // 身体接触伤害
     if(Math.abs(player.x-boss.x)<92&&player.y+player.h>GROUND-125)hit();
   }
+
   if(player.y>H+80){
     hit();
     player.y=GROUND-player.h;
@@ -1103,6 +1247,46 @@ function draw(){
     ctx.lineTo(bx+62,by-12);ctx.lineTo(bx+78,by+17);ctx.lineTo(bx+100,by-3);
     ctx.lineTo(bx+105,by+31);ctx.closePath();ctx.fill();
     ctx.fillStyle="#e64c68";ctx.fillRect(bx+3,by+139,118,16);
+
+    // ---- Boss 前摇视觉预警 ----
+    if(boss.telegraph>0){
+      const prog=1-(boss.telegraph/(boss.telegraphKind==="charge"?1.75:boss.telegraphKind==="fire"?1.55:1.35));
+      ctx.save();
+      ctx.globalAlpha=0.28+Math.sin(frame*.2)*.10;
+      if(boss.telegraphKind==="fire"){
+        ctx.fillStyle="#ff6b4a";
+        ctx.beginPath();
+        ctx.ellipse(bx+62,by+80,70+prog*20,80+prog*20,0,0,7);
+        ctx.fill();
+      }else if(boss.telegraphKind==="wave"){
+        ctx.fillStyle="#f7b83e";
+        ctx.fillRect(0,GROUND-8,W,8);
+      }else if(boss.telegraphKind==="charge"){
+        ctx.fillStyle="#ff334f";
+        ctx.fillRect(0,GROUND-18,W,18);
+      }
+      ctx.restore();
+
+      ctx.fillStyle="#fff";
+      ctx.font="bold 20px Arial";
+      ctx.textAlign="center";
+      if(boss.telegraphKind==="fire")ctx.fillText("⚠ 暗影火球蓄力中",W/2,GROUND-58);
+      else if(boss.telegraphKind==="wave")ctx.fillText("⚠ 冲击波预警",W/2,GROUND-58);
+      else if(boss.telegraphKind==="charge")ctx.fillText("⚠ 冲锋方向锁定",W/2,GROUND-58);
+      ctx.textAlign="left";
+
+      if(boss.telegraphKind==="charge"){
+        ctx.strokeStyle="#ff5266";
+        ctx.lineWidth=4;
+        ctx.setLineDash([12,8]);
+        ctx.beginPath();
+        ctx.moveTo(bx+62,GROUND-30);
+        ctx.lineTo(bx+62+boss.telegraphDir*260,GROUND-30);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
     if(boss.charge>0){
       ctx.fillStyle="rgba(255,55,75,.28)";ctx.fillRect(0,GROUND-30,W,30);
       ctx.fillStyle="#ff5266";ctx.font="bold 18px Arial";
@@ -1111,7 +1295,7 @@ function draw(){
     bossProjectiles.forEach(p=>{
       ctx.fillStyle=p.kind==="wave"?"#f7b83e":"#e65d52";
       ctx.beginPath();
-      if(p.kind==="wave")ctx.ellipse(p.x-scroll,p.y,25,12,0,0,7);
+      if(p.kind==="wave")ctx.ellipse(p.x-scroll,p.y,26,13,0,0,7);
       else ctx.arc(p.x-scroll,p.y,p.r||14,0,7);
       ctx.fill();
     });
