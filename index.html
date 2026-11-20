@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🍡 团子冒险世界</title>
+<title>🍡 团子冒险世界 - 邪眼降临</title>
 <style>
 *{
   box-sizing:border-box
@@ -109,7 +109,8 @@ button:disabled{
   align-items:center;
   gap:10px;
   margin:12px auto;
-  max-width:500px
+  max-width:560px;
+  flex-wrap:wrap;
 }
 .controls button{
   width:85px;
@@ -124,9 +125,6 @@ button:disabled{
 }
 #attack{
   background:#ffb3a7
-}
-#release{
-  background:#b7d8ff
 }
 #shopItems{
   display:grid;
@@ -164,9 +162,11 @@ input{
     padding:7px
   }
   .controls button{
-    width:76px;
-    height:62px
+    width:70px;
+    height:58px;
+    font-size:20px
   }
+  #onionSkill{width:132px;font-size:14px}
   .panel{
     padding:17px
   }
@@ -226,9 +226,12 @@ button:focus-visible, input:focus-visible {
 #attack {
   background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
 }
-#release {
-  background: linear-gradient(180deg, #cfe4ff, #9cc4ff);
-}
+#onionSkill{width:138px;background:linear-gradient(180deg,#fff0a8,#ffb52e);color:#512b08;font-size:15px;border:2px solid #ffe7a0;box-shadow:0 0 14px rgba(255,190,55,.28)}
+#onionSkill.charging{background:linear-gradient(180deg,#fff7c7,#ff8b28);box-shadow:0 0 22px rgba(255,165,35,.75);animation:chargePulse .45s infinite alternate}
+#onionSkill:disabled{filter:grayscale(.65);opacity:.55}
+@keyframes chargePulse{from{transform:scale(1)}to{transform:scale(1.035)}}
+#release{background:linear-gradient(180deg,#d9e8ff,#9cc4ff);font-size:18px}
+#hpContainer{border-color:rgba(255,105,125,.45);color:#ffd5dc}
 #msg {
   padding: 8px 12px;
   margin: 7px auto;
@@ -299,23 +302,23 @@ footer {
 <body>
 <h1>🍡 团子冒险世界</h1>
 <div class="info">
- <span>❤️ 生命：<b id="lives">3</b></span>
+ <span id="livesContainer">❤️ 生命：<b id="lives">3</b></span>
+ <span id="hpContainer" class="hidden">🩸 血量：<b id="playerHp">75</b>/75</span>
  <span>🪙 金币：<b id="coins">0</b></span>
  <span>🚀 火箭：<b id="fuel">无</b></span>
- <span>🗺️ 关卡：<b id="level">1</b>/5</span>
+ <span>🗺️ 关卡：<b id="level">1</b>/6</span>
  <span id="weaponInfo">🥢 武器：无</span>
 </div>
 <!-- 主游戏画布：固定逻辑分辨率，CSS 自适应手机屏幕 -->
 <canvas id="game" width="960" height="540"></canvas>
 <div class="controls">
  <button id="left">⬅️</button><button id="jump">⬆️</button><button id="right">➡️</button>
- <button id="attack">⚔️</button>
+ <button id="attack">⚔️ 普攻</button><button id="onionSkill" disabled>🥢 大葱蓄力</button><button id="release">🖐️</button>
 </div>
 <div>
  <button id="restart">重新开始本关</button>
  <button id="shopButton">👕 团子商店</button>
  <button id="rulesButton">游戏规则</button>
- <button id="release">🖐️ 松开箱子</button>
 </div>
 <div>
  <input id="code" maxlength="4" placeholder="输入作弊码">
@@ -326,19 +329,20 @@ footer {
 <div id="overlay">
  <div class="panel" id="welcome">
   <div class="big">🍡</div><h2>团子冒险世界</h2>
-  <p>欢迎来到团子的五关冒险世界！</p>
-  <p>自由移动、躲避陷阱、收集金币、挑战章鱼和邪恶团子！</p>
+  <p>欢迎来到团子的六关冒险世界！</p>
+  <p>自由移动、躲避陷阱、收集金币，破解机关，挑战邪恶团子与终极Boss「邪眼」！</p>
   <button id="startAdventure">开始游戏</button>
   <button id="welcomeTutorial">新手教程</button>
   <button id="welcomeShop">团子商店</button>
   <button id="welcomeDisclaimer">免责声明</button>
-  <p class="small">原创角色 · 五大关卡 · 冒险游戏</p>
+  <p class="small">原创角色 · 六大关卡 · 邪眼最终战</p>
  </div>
  <div class="panel hidden" id="tutorial">
   <h2>📖 新手教程</h2>
   <p>⬅️➡️ 左右移动，⬆️ 跳跃。长按跳跃键使用火箭背包（解锁后）。</p>
   <p>🪙 金币放在地面附近，走过去即可收集，不需要跳得很高。</p>
-  <p>🐙 章鱼会移动并喷墨。第四关推箱子压住传感器，第五关挑战 Boss。</p>
+  <p>🐙 章鱼会移动并喷射墨弹。第四关推箱子压住传感器；第五关挑战邪恶团子；第六关迎战邪眼。</p>
+  <p>🥢 获得传奇大葱后，长按「大葱蓄力」3秒，自动释放70点伤害的必杀技；必杀技冷却4.5秒。</p>
   <p>🚀 作弊码：67mj，获得火箭背包。</p>
   <button id="tutorialStart">开始第一关</button>
  </div>
@@ -348,9 +352,9 @@ footer {
  </div>
  <div class="panel hidden" id="rulesPanel">
   <h2>📖 游戏规则</h2>
-  <p>❤️ 三条生命；⬅️➡️ 自由移动；⬆️ 跳跃和飞行；🐙 章鱼会移动并喷墨；🪙 收集金币购买装扮；第四关推箱子解谜；第五关挑战邪恶团子。</p>
-  <p>第四关小提示：推箱子时如果不想再推了，点击「🖐️ 松开箱子」按钮，箱子会留在原地。</p>
-  <p>第四关小提示：把箱子推到尖刺上，尖刺会暂时失效 3 秒，趁着失效时间快速通过！</p>
+  <p>❤️ 前五关使用三条生命；⬅️➡️ 移动；⬆️ 跳跃和火箭飞行；🐙 章鱼会移动并喷墨；🪙 金币可购买装扮；第四关推箱解谜；第五关挑战邪恶团子。</p>
+  <p>👁️ 第六关改为75点血量，邪眼会释放毒雾、方向反转和斜眼激光。Boss血量降至40%会锁血并进入剧情，随后狂暴。</p>
+  <p>🥢 传奇大葱：普通攻击有间隔；长按蓄力键3秒自动释放70点必杀伤害，冷却4.5秒。</p>
   <button id="rulesBack">返回</button>
  </div>
  <div class="panel hidden" id="stagePanel">
@@ -388,6 +392,9 @@ window.addEventListener("error",function(e){
   const m=document.getElementById("msg");if(m)m.textContent="游戏脚本出现异常，请刷新页面；错误："+(e.message||"未知错误");
 });
 const W=960,H=540,GROUND=435,LEVEL_LENGTH=2600;
+const FINAL_BOSS_MAX_HP=900;
+let finalBoss={active:false,x:760,y:245,hp:FINAL_BOSS_MAX_HP,maxHp:FINAL_BOSS_MAX_HP,phase:1,locked:false,dialog:0,poisonTimer:2.2,protocolTimer:6.5,laserTimer:4.2,poisonZones:[],lasers:[],orbTimer:5.5,flash:0};
+let finalHp=75,finalInvuln=0,finalTime=0,finalParticles=[];
 let state="menu",level=1,lives=3,coins=Number(localStorage.getItem("tuanziCoins")||0);
 const MAX_FUEL=900;
 let scroll=0,fuel=0,cheated=localStorage.getItem("tuanziCheated")==="yes";
@@ -403,23 +410,19 @@ let player={
 ;
 let obstacles=[],gold=[],octopus=[],ink=[],platforms=[];
 let crate={
-  x:450,y:GROUND-54,w:54,h:54,pushFlash:0
+  x:450,y:GROUND-54,w:54,h:54
 }
 ,sensor={
   x:1180,w:92
 }
 ;
 let doorOpen=false,chestOpened=localStorage.getItem("tuanziChestOpened")==="yes";
-/* Boss 增加死亡状态字段：dead / deathTimer / deathParticles */
 let boss={
-  x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0,
-  telegraph:0,telegraphKind:"",telegraphDir:1,
-  dead:false,deathTimer:0,deathParticles:[]
+  x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
 }
 ;
 let bossProjectiles=[],attackCooldown=0,toastFrames=0;
-/* 推箱「松开」冷却计时器。按下「🖐️ 松开箱子」后 0.5 秒内不再推动箱子。 */
-let noPushTimer=0;
+let onionCharging=false,onionChargeTime=0,onionSkillCooldown=0,onionSkillReady=false;
 const cosmetics=[
 {
   id:"normal",name:"原始团子",price:0,emoji:"🍡"
@@ -469,6 +472,10 @@ function updateUI(){
   document.getElementById("level").textContent=level;
   document.getElementById("shopCoins").textContent=coins;
   document.getElementById("weaponInfo").textContent=hasOnion?"🥢 武器：传奇大葱":"🥢 武器：无";
+  const onionBtn=document.getElementById("onionSkill");
+  if(onionBtn){onionBtn.disabled=!hasOnion; if(!hasOnion){onionBtn.textContent="🥢 需传奇大葱";onionBtn.classList.remove("charging");}else if(!onionCharging){onionBtn.textContent=onionSkillCooldown>0?`🥢 冷却 ${onionSkillCooldown.toFixed(1)}s`:"🥢 长按蓄力";}}
+  if(level===6){document.getElementById("livesContainer").classList.add("hidden");document.getElementById("hpContainer").classList.remove("hidden");document.getElementById("playerHp").textContent=Math.ceil(finalHp);}
+  else{document.getElementById("livesContainer").classList.remove("hidden");document.getElementById("hpContainer").classList.add("hidden");}
 }
 function makeLevel(){
   obstacles=[];
@@ -479,7 +486,6 @@ function makeLevel(){
   bossProjectiles=[];
   scroll=0;
   doorOpen=false;
-  noPushTimer=0;
   if(level<=3){
     let x=420;
     while(x<LEVEL_LENGTH-180){
@@ -506,7 +512,7 @@ function makeLevel(){
   if(level===4){
     // 第四关：谜题场景，彩蛋宝箱在出生点后方
     crate={
-      x:480,y:GROUND-54,w:54,h:54,pushFlash:0
+      x:480,y:GROUND-54,w:54,h:54
     }
     ;
     sensor={
@@ -516,29 +522,31 @@ function makeLevel(){
     for(let i=0;i<13;i++)gold.push({
       x:220+i*115,y:GROUND-48,got:false
     });
-    /* 尖刺新增 disabledTimer：箱子压上去时尖刺暂时失效 */
     obstacles=[{
-      x:850,w:50,h:42,type:"spike",moving:false,phase:0,disabledTimer:0
+      x:850,w:50,h:42,type:"spike",moving:false,phase:0
     }
     ];
   }
   if(level===5){
     boss={
-      x:2100,y:GROUND-146,hp:300,maxHp:300,attackTimer:1.15,flash:0,skillTimer:3.2,charge:0,chargeDir:-1,phase:0,
-      telegraph:0,telegraphKind:"",telegraphDir:1,
-      dead:false,deathTimer:0,deathParticles:[]
+      x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
     }
     ;
     for(let i=0;i<10;i++)gold.push({
       x:250+i*105,y:GROUND-48,got:false
     });
   }
+  if(level===6){
+    finalBoss={active:true,x:760,y:245,hp:FINAL_BOSS_MAX_HP,maxHp:FINAL_BOSS_MAX_HP,phase:1,locked:false,dialog:0,poisonTimer:2.0,protocolTimer:6.5,laserTimer:4.0,poisonZones:[],lasers:[],orbTimer:5.2,flash:0};
+    finalHp=75;finalInvuln=0;finalTime=0;finalParticles=[];scroll=0;
+    platforms=[];obstacles=[];gold=[];octopus=[];ink=[];bossProjectiles=[];
+  } else {finalBoss.active=false;finalHp=75;}
   player={
     x:100,y:GROUND-55,w:55,h:55,vx:0,vy:0,onGround:true,facing:1
   }
   ;
   invincible=0;
-  attackCooldown=0;
+  attackCooldown=0;onionCharging=false;onionChargeTime=0;onionSkillCooldown=0;onionSkillReady=false;
   updateUI();
 }
 function startGame(){
@@ -552,14 +560,14 @@ function startGame(){
   say("第一关开始！金币就在地面附近，走过去收集吧！");
 }
 function startNext(){
-  if(level<5){
+  if(level<6){
     level++;
     lives=3;
     if(cheated)fuel=MAX_FUEL;
     state="play";
     makeLevel();
     closePanel();
-    say("进入第"+level+"关！"+(level===4?"把箱子推到尖刺上，尖刺会暂时失效！":""));
+    say("进入第"+level+"关！");
   }
   else finishGame(true);
 }
@@ -579,8 +587,8 @@ function finishGame(win){
   }
   ;
   document.getElementById("endIcon").textContent=win?"🏆":"💔";
-  document.getElementById("endTitle").textContent=win?"五关全部通关！":"游戏失败！";
-  document.getElementById("endText").textContent=win?"你打败了邪恶团子，成为团子冒险冠军！":"生命用完了，再挑战一次吧！";
+  document.getElementById("endTitle").textContent=win?"六关全部通关！":"游戏失败！";
+  document.getElementById("endText").textContent=win?"你击败了邪恶团子与终极邪眼，拯救了团子世界！":"生命用完了，再挑战一次吧！";
   showPanel("ending");
 }
 function hit(){
@@ -677,153 +685,105 @@ function jump(){
     player.onGround=false;
   }
 }
+function getBossTarget(){
+  if(level===6)return {x:finalBoss.x,y:finalBoss.y,reach:hasOnion?175:135};
+  if(level===5)return {x:boss.x+30,y:GROUND-147,reach:hasOnion?145:105};
+  return null;
+}
+function hitBossWithOnionSkill(){
+  if(!hasOnion||state!=="play")return;
+  if(level!==5&&level!==6){say("🥢 大葱蓄力技只能对Boss使用！");return;}
+  if(onionSkillCooldown>0)return;
+  const target=getBossTarget();
+  const distance=Math.hypot((player.x+player.w/2)-target.x,(player.y+player.h/2)-target.y);
+  if(distance>target.reach+20){say("💥 大葱蓄力完成，但距离Boss太远，技能挥空了！");onionSkillCooldown=1.5;return;}
+  if(level===6){
+    if(finalBoss.locked||finalBoss.hp<=0){say("邪眼处于无敌阶段，暂时无法受到伤害！");onionSkillCooldown=1.5;return;}
+    finalBoss.hp=Math.max(finalBoss.maxHp*.4,finalBoss.hp-70);
+    finalBoss.flash=.32;
+    for(let i=0;i<20;i++)finalParticles.push({x:finalBoss.x,y:finalBoss.y,vx:(Math.random()-.5)*380,vy:(Math.random()-.5)*380,life:.7});
+  }else{
+    if(boss.hp<=0){say("邪恶团子已经被击败！");return;}
+    boss.hp=Math.max(0,boss.hp-70);boss.flash=24;
+    for(let i=0;i<16;i++)finalParticles.push({x:target.x,y:target.y,vx:(Math.random()-.5)*300,vy:(Math.random()-.5)*300,life:.55});
+  }
+  onionSkillCooldown=4.5;
+  attackCooldown=Math.max(attackCooldown,18);
+  say("🌟 传奇大葱·蓄力必杀！造成 70 点伤害！");
+}
+function startOnionCharge(){
+  if(state!=="play"||!hasOnion||onionSkillCooldown>0||onionCharging)return;
+  if(level!==5&&level!==6){say("🥢 传奇大葱蓄力技将在Boss关卡解锁使用！");return;}
+  onionCharging=true;onionChargeTime=0;
+  const b=document.getElementById("onionSkill");b.classList.add("charging");b.textContent="🥢 蓄力 0%";
+  say("🥢 传奇大葱开始蓄力！坚持3秒！");
+}
+function stopOnionCharge(){
+  onionCharging=false;
+  const b=document.getElementById("onionSkill");
+  b.classList.remove("charging");
+  if(onionChargeTime>=3){
+    onionChargeTime=0;
+    hitBossWithOnionSkill();
+  }else if(onionChargeTime>0){
+    say("蓄力中断！需要持续按住3秒才能释放必杀技。");
+    onionChargeTime=0;
+  }
+  if(hasOnion&&onionSkillCooldown<=0)b.textContent="🥢 长按蓄力";
+}
 function attack(){
-  if(state!=="play"||level!==5||attackCooldown>0)return;
-  attackCooldown=24;
+  if(state!=="play"||attackCooldown>0)return;
+  attackCooldown=level===6?42:36; // 约0.7秒攻击间隔，避免连续点击秒杀Boss
+  if(level===6){
+    const distance=Math.hypot((player.x+player.w/2)-finalBoss.x,(player.y+player.h/2)-finalBoss.y);
+    const reach=hasOnion?175:135;
+    if(distance<=reach&&!finalBoss.locked&&finalBoss.hp>0){
+      const damage=hasOnion?22:12;
+      finalBoss.hp=Math.max(finalBoss.maxHp*.4,finalBoss.hp-damage);
+      finalBoss.flash=.16;
+      say(hasOnion?"🥢 传奇大葱普通攻击！-22 HP":"普通攻击命中邪眼！-12 HP");
+      for(let i=0;i<8;i++)finalParticles.push({x:finalBoss.x,y:finalBoss.y,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220,life:.45});
+    }else if(finalBoss.locked)say("邪眼正在展开黑暗协议，暂时无法受到伤害！");
+    else say("靠近邪眼一点再攻击！");
+    return;
+  }
+  if(level!==5)return;
   const distance=Math.abs((player.x+player.w/2)-(boss.x+30));
   const reach=hasOnion?145:105;
   if(distance<=reach){
-    const damage=hasOnion?15:5;
-    boss.hp=Math.max(0,boss.hp-damage);
-    boss.flash=12;
-    say(hasOnion?"🥢 传奇大葱命中！Boss -15 HP":"普通攻击命中！Boss -5 HP");
-    if(boss.hp<=0){
-      say("邪恶团子被击败了！走到终点完成关卡！");
-    }
-  }
-  else say("再靠近邪恶团子一点才能打中！");
+    const damage=hasOnion?12:8;
+    boss.hp=Math.max(0,boss.hp-damage);boss.flash=12;
+    say(hasOnion?"🥢 传奇大葱普通攻击！Boss -12 HP":"普通攻击命中！Boss -8 HP");
+    if(boss.hp<=0)say("邪恶团子被击败了！走到终点完成关卡！");
+  }else say("再靠近邪恶团子一点才能打中！");
 }
 function rectHit(a,b){
   return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 }
-
-/* ============================================================
-   第四关推箱子：标准 Sokoban 式“侧向接触”推动
-   ------------------------------------------------------------
-   只在这两种情况下推动箱子：
-     · 向右：移动前玩家右缘 <= 箱子左缘(+1)，移动后右缘 > 箱子左缘
-     · 向左：移动前玩家左缘 >= 箱子右缘(-1)，移动后左缘 < 箱子右缘
-   其它情况（远离、站箱顶、在另一侧）一律不推，避免箱子粘人。
-   ============================================================ */
-function tryPushCrate(dt){
-  if(level!==4)return;
-
-  const dx=player.vx*dt*60;
-  const oldPlayerX=player.x;
-
-  // 没有水平速度：不移动，也不推箱
-  if(Math.abs(dx)<0.0001)return;
-
-  const oldPlayerRight=oldPlayerX+player.w;
-  const oldPlayerLeft=oldPlayerX;
-  const crateLeft=crate.x;
-  const crateRight=crate.x+crate.w;
-
-  // 垂直方向必须与箱子有侧面重叠（站在箱顶不算推箱）
-  const verticalOverlap=
-    player.y+player.h>crate.y+6 &&
-    player.y<crate.y+crate.h-6;
-
-  // 「松开」冷却中，或没有垂直重叠：只移动玩家，不推箱
-  if(noPushTimer>0 || !verticalOverlap){
-    player.x=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,oldPlayerX+dx));
-    return;
-  }
-
-  // ---- 向右移动 ----
-  if(dx>0){
-    const newRight=oldPlayerRight+dx;
-    // 只有「移动前在箱子左侧、移动后跨入箱子」才推
-    if(oldPlayerRight<=crateLeft+1 && newRight>crateLeft){
-      const overlap=newRight-crateLeft;
-      const targetCrateX=crate.x+overlap;
-      const blocked=
-        targetCrateX<180 ||
-        targetCrateX+crate.w>1450 ||
-        (targetCrateX+crate.w>2250 && targetCrateX<2274);
-      if(blocked){
-        // 箱子推不动：玩家贴着箱子边缘停下
-        player.x=crateLeft-player.w;
-        player.vx=0;
-      }else{
-        crate.x=targetCrateX;
-        player.x=crate.x-player.w;
-        crate.pushFlash=12;
-      }
-      return;
-    }
-  }
-  // ---- 向左移动 ----
-  else{
-    const newLeft=oldPlayerLeft+dx;
-    // 只有「移动前在箱子右侧、移动后跨入箱子」才推
-    if(oldPlayerLeft>=crateRight-1 && newLeft<crateRight){
-      const overlap=crateRight-newLeft;
-      const targetCrateX=crate.x-overlap;
-      const blocked=
-        targetCrateX<180 ||
-        targetCrateX+crate.w>1450 ||
-        (targetCrateX+crate.w>2250 && targetCrateX<2274);
-      if(blocked){
-        player.x=crateRight;
-        player.vx=0;
-      }else{
-        crate.x=targetCrateX;
-        player.x=crate.x+crate.w;
-        crate.pushFlash=12;
-      }
-      return;
-    }
-  }
-
-  // ---- 没有撞上箱子：正常移动 ----
-  player.x=Math.max(-470,Math.min(LEVEL_LENGTH-player.w,oldPlayerX+dx));
-
-  // 兜底：如果移动后仍与箱子水平重叠（异常情况），把玩家分离出去
-  const finalRight=player.x+player.w;
-  const finalLeft=player.x;
-  if(finalRight>crateLeft && finalLeft<crateRight && verticalOverlap){
-    if(oldPlayerX+player.w/2 < crate.x+crate.w/2){
-      player.x=crateLeft-player.w;
-    }else{
-      player.x=crateRight;
-    }
-    player.vx=0;
-  }
-}
-
-/* 主动「松开箱子」：让玩家离开箱子一小段距离，并在 0.5 秒内不推箱 */
-function releaseCrate(){
-  if(state!=="play"||level!==4){
-    say("🖐️ 「松开箱子」只在第四关推箱子时使用。");
-    return;
-  }
-  noPushTimer=0.5;
-  const verticalOverlap=
-    player.y+player.h>crate.y+6 &&
-    player.y<crate.y+crate.h-6;
-  if(verticalOverlap){
-    const pCenter=player.x+player.w/2;
-    const cCenter=crate.x+crate.w/2;
-    if(pCenter<cCenter){
-      player.x=crate.x-player.w-5;
-    }else{
-      player.x=crate.x+crate.w+5;
-    }
-    player.vx=0;
-  }
-  say("🖐️ 已松开箱子！箱子会留在原地，0.5 秒内不会跟着你动。");
-}
-
 function update(dt){
   if(state!=="play")return;
   dt=Math.min(dt,.035);
   frame+=dt*60;
   if(invincible>0)invincible-=dt*60;
-  if(attackCooldown>0)attackCooldown-=dt*60;
-  if(crate.pushFlash>0)crate.pushFlash-=dt*60;
-  if(noPushTimer>0)noPushTimer-=dt;
-
+  if(attackCooldown>0)attackCooldown=Math.max(0,attackCooldown-dt*60);
+  if(onionSkillCooldown>0){
+    onionSkillCooldown=Math.max(0,onionSkillCooldown-dt);
+    if(!onionCharging&&hasOnion){
+      const b=document.getElementById("onionSkill");
+      if(b)b.textContent=onionSkillCooldown>0?`🥢 冷却 ${onionSkillCooldown.toFixed(1)}s`:"🥢 长按蓄力";
+    }
+  }
+  if(onionCharging){
+    onionChargeTime=Math.min(3,onionChargeTime+dt);
+    const pct=Math.floor(onionChargeTime/3*100);
+    const b=document.getElementById("onionSkill");
+    if(b)b.textContent=`🥢 蓄力 ${pct}%`;
+    if(onionChargeTime>=3){
+      onionCharging=false;onionChargeTime=0;
+      if(b)b.classList.remove("charging");
+      hitBossWithOnionSkill();
+    }
+  }
   // 平滑加速、松手缓停
   const dir=(holding.right?1:0)-(holding.left?1:0);
   const maxSpeed=fuel>0?5.0:4.2;
@@ -833,7 +793,6 @@ function update(dt){
   }
   else player.vx*=Math.pow(.78,dt*60);
   player.vx=Math.max(-maxSpeed,Math.min(maxSpeed,player.vx));
-
   // 跳跃与火箭背包：推力渐进，松开后自然下落
   if(holding.jump&&fuel>0){
     player.vy-=.43*dt*60;
@@ -842,16 +801,30 @@ function update(dt){
   }
   player.vy+=.42*dt*60;
   player.vy=Math.min(player.vy,10);
-
-  // ---- 水平移动 + 第四关推箱子 ----
+  const previousX=player.x;
+  player.x+=player.vx*dt*60;
+  player.x=Math.max(level===4?-470:0,Math.min(LEVEL_LENGTH-player.w,player.x));
   if(level===4){
-    tryPushCrate(dt);
-  }else{
-    player.x+=player.vx*dt*60;
-    player.x=Math.max(0,Math.min(LEVEL_LENGTH-player.w,player.x));
+    const boxLeft=crate.x;
+    const boxRight=crate.x+crate.w;
+    const nextRight=player.x+player.w;
+    const nextLeft=player.x;
+    const verticalTouch=player.y+player.h>GROUND-crate.h+5;
+    if(verticalTouch && nextRight>boxLeft && nextLeft<boxRight){
+      if(player.vx>0 && previousX+player.w<=boxLeft+4){
+        crate.x+=player.x-previousX;
+        player.x=crate.x-player.w;
+      }
+      else if(player.vx<0 && previousX>=boxRight-4){
+        crate.x+=player.x-previousX;
+        player.x=crate.x+crate.w;
+      }
+      else{
+        player.x=previousX;
+        player.vx=0;
+      }
+    }
   }
-
-  // ---- 垂直移动 ----
   const oldBottom=player.y+player.h;
   player.y+=player.vy*dt*60;
   player.onGround=false;
@@ -859,70 +832,33 @@ function update(dt){
   platforms.forEach(p=>{
     if(player.x+player.w>p.x&&player.x<p.x+p.w&&oldBottom<=p.y+10&&player.y+player.h>=p.y&&player.vy>=0)landing=Math.min(landing,p.y);
   });
-
-  // 第四关：箱子顶面可作为落脚点
-  if(level===4){
-    const onCrate=
-      player.x+player.w>crate.x+4 &&
-      player.x<crate.x+crate.w-4 &&
-      oldBottom<=crate.y+18 &&
-      player.y+player.h>=crate.y &&
-      player.vy>=0;
-    if(onCrate)landing=Math.min(landing,crate.y);
-  }
-
   if(player.y+player.h>=landing){
     player.y=landing-player.h;
     player.vy=0;
     player.onGround=true;
   }
-
   // 火箭背包可重复使用：落地后自动缓慢充能
   if(cheated&&player.onGround){
     fuel=Math.min(MAX_FUEL,fuel+2.4*dt*60);
   }
-
   scroll=Math.max(level===4?-500:0,Math.min(LEVEL_LENGTH-W,player.x-270));
-
-  // ============================================================
-  // 陷阱 + 尖刺失效机制
-  // 当箱子压到尖刺上时，尖刺立即失效 3 秒（每帧接触都刷新倒计时），
-  // 团子推箱经过或随后走过都不会受伤，箱子也不会卡住。
-  // ============================================================
+  // 陷阱
   obstacles.forEach(o=>{
     let y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
-
-    // 尖刺失效计时器（第四关箱子压住时刷新）
-    if(typeof o.disabledTimer!=="number")o.disabledTimer=0;
-
-    if(level===4 && o.type==="spike"){
-      const crateOverlapX = crate.x < o.x+o.w && crate.x+crate.w > o.x;
-      const crateOnGround = Math.abs(crate.y - (GROUND-crate.h)) < 8;
-      if(crateOverlapX && crateOnGround){
-        // 箱子正压在尖刺上：刷新失效倒计时为 3 秒
-        o.disabledTimer = 3.0;
-      }
-    }
-    if(o.disabledTimer>0)o.disabledTimer-=dt;
-
+    const bx=o.x-scroll;
     if(o.type==="spike"){
-      if(o.disabledTimer>0){
-        // 尖刺失效中：完全不造成伤害
-      }else{
-        const crateCoversSpike=level===4 &&
-          crate.x<o.x+o.w+crate.w*0.15 &&
-          crate.x+crate.w>o.x-o.w*0.15;
-        if(!crateCoversSpike &&
-           player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&
-           player.y+player.h>y+12)hit();
-      }
+      const crateCoversSpike=level===4 &&
+        crate.x<o.x+o.w+crate.w*0.15 &&
+        crate.x+crate.w>o.x-o.w*0.15;
+      if(!crateCoversSpike &&
+         player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&
+         player.y+player.h>y+12)hit();
     }else if(rectHit({
       x:player.x,y:player.y,w:player.w,h:player.h
     },{
       x:o.x,y,w:o.w,h:o.h
     }))hit();
   });
-
   // 章鱼及墨汁
   octopus.forEach(o=>{
     const y=o.baseY+Math.sin(frame*.035+o.phase)*29;
@@ -941,8 +877,7 @@ function update(dt){
     }
   });
   ink=ink.filter(b=>b.x>scroll-100&&b.x<scroll+W+100);
-
-  // 金币拾取
+  // 金币拾取，碰撞范围稍宽松，金币位置低且易拿
   gold.forEach(c=>{
     if(c.got)return;
     const dx=player.x+player.w/2-c.x,dy=player.y+player.h/2-c.y;
@@ -950,12 +885,11 @@ function update(dt){
       c.got=true;coins++;saveData();updateUI();say("🪙 收到金币！");
     }
   });
-
   // 第四关：箱子推向传感器
   if(level===4){
     crate.x=Math.max(180,Math.min(1450,crate.x));
     doorOpen=crate.x+crate.w>sensor.x+5&&crate.x<sensor.x+sensor.w+crate.w-5;
-
+    // 出生点后方彩蛋箱：需要往左走到 x< -85
     if(!chestOpened&&player.x<-300){
       chestOpened=true;
       hasOnion=true;
@@ -970,163 +904,60 @@ function update(dt){
     }
     if(player.x>=LEVEL_LENGTH-110&&doorOpen)completeStage();
   }
-
-  // ============================================================
-  // 第五关 Boss：长前摇 + 强化技能 + 死亡爆炸
-  // 关键修复：
-  //   1. 火球方向改为瞄准玩家（以前 cos(angle) 永远为正，只会往右飞）
-  //   2. 冲锋方向改用 Boss 中心与玩家中心比较（以前用左边缘比较会误判）
-  //   3. Boss 血量为 0 时进入死亡状态，播放爆炸粒子，血条显示“已击败”
-  // ============================================================
-  if(level===5){
-    if(boss.hp>0){
-      boss.attackTimer-=dt;
-      boss.skillTimer-=dt;
-      boss.phase+=dt*2.2;
-      // 受击闪白计时器递减（以前漏了，导致 Boss 一直闪白）
-      if(boss.flash>0)boss.flash-=dt*60;
-
-      // ---- 前摇阶段 ----
-      if(boss.telegraph>0){
-        boss.telegraph-=dt;
-        if(boss.telegraph<=0){
-          // 前摇结束，释放对应技能
-          if(boss.telegraphKind==="fire"){
-            // 火球瞄准玩家方向发射扇形
-            const bx0=boss.x+62, by0=GROUND-85;
-            const targetX=player.x+player.w/2;
-            const targetY=player.y+player.h/2;
-            const baseAngle=Math.atan2(targetY-by0, targetX-bx0);
-            const speed=330;
-            for(let i=0;i<5;i++){
-              const angle=baseAngle+(i-2)*0.13;
-              bossProjectiles.push({
-                x:bx0,y:by0,
-                vx:Math.cos(angle)*speed,
-                vy:Math.sin(angle)*speed,
-                life:5.0,r:13,kind:"fire"
-              });
-            }
-            say("🔥 五连暗影火球！");
-          }else if(boss.telegraphKind==="wave"){
-            bossProjectiles.push({
-              x:boss.x-80,y:GROUND-15,vx:-420,vy:0,life:5.2,r:22,kind:"wave"
-            });
-            bossProjectiles.push({
-              x:boss.x+140,y:GROUND-15,vx:420,vy:0,life:5.2,r:22,kind:"wave"
-            });
-            say("⚡ 双向地面冲击波！必须跳起来躲开！");
-          }else if(boss.telegraphKind==="charge"){
-            boss.charge=0.92;
-            boss.chargeDir=boss.telegraphDir;
-            say("💢 邪恶团子冲锋！");
-          }
-          boss.telegraphKind="";
-          boss.telegraph=0;
-          boss.skillTimer=3.8+Math.random()*1.2;
-        }
+  // 第五关 Boss：三种技能轮换，攻击前有短暂预警
+  if(level===5&&boss.hp>0){
+    boss.attackTimer-=dt;
+    boss.skillTimer-=dt;
+    boss.phase+=dt*2.2;
+    if(boss.charge>0){
+      boss.charge-=dt;
+      boss.x+=boss.chargeDir*520*dt;
+      if(Math.abs(player.x-boss.x)<92 && player.y+player.h>GROUND-125)hit();
+      if(boss.charge<=0){
+        boss.x=Math.max(520,Math.min(LEVEL_LENGTH-420,boss.x));
+        boss.attackTimer=0.65;
       }
-      // ---- 冲锋执行 ----
-      else if(boss.charge>0){
-        boss.charge-=dt;
-        boss.x+=boss.chargeDir*560*dt;
-        if(Math.abs(player.x-boss.x)<98 && player.y+player.h>GROUND-130)hit();
-        if(boss.charge<=0){
-          boss.x=Math.max(520,Math.min(LEVEL_LENGTH-420,boss.x));
-          boss.attackTimer=0.75;
-        }
-      }
-      // ---- 选择下一个技能并进入前摇 ----
-      else if(boss.skillTimer<=0){
-        const roll=Math.floor(Math.random()*3);
-        if(roll===0){
-          boss.telegraph=1.55;
-          boss.telegraphKind="fire";
-          say("⚠ 邪恶团子正在凝聚暗影火球……");
-        }else if(roll===1){
-          boss.telegraph=1.35;
-          boss.telegraphKind="wave";
-          say("⚠ 地面开始震动！冲击波即将来袭！");
-        }else{
-          boss.telegraph=1.75;
-          boss.telegraphKind="charge";
-          // 冲锋方向：用 Boss 中心与玩家中心比较，避免站在脸上反方向冲
-          const bossCenter=boss.x+62;
-          const playerCenter=player.x+player.w/2;
-          boss.telegraphDir=playerCenter<bossCenter?-1:1;
-          say("⚠ 邪恶团子压低身体，准备冲锋！");
-        }
-      }
-
-      // 身体接触伤害
-      if(Math.abs(player.x-boss.x)<92&&player.y+player.h>GROUND-125)hit();
-    } else {
-      // ============ Boss 死亡处理 ============
-      if(!boss.dead){
-        boss.dead=true;
-        boss.deathTimer=2.2;
-        bossProjectiles=[]; // 死亡瞬间清空残留弹幕，避免最后被阴
-        // 生成爆炸粒子
-        for(let i=0;i<70;i++){
-          const ang=Math.random()*Math.PI*2;
-          const sp=2+Math.random()*9;
-          boss.deathParticles.push({
-            x:boss.x+62+(Math.random()-0.5)*70,
-            y:GROUND-146+90+(Math.random()-0.5)*80,
-            vx:Math.cos(ang)*sp,
-            vy:Math.sin(ang)*sp-3,
-            life:0.9+Math.random()*1.5,
-            size:3+Math.random()*7,
-            color:Math.random()<0.34?"#ffd166":(Math.random()<0.5?"#ff6b4a":"#9b42d6")
+    }else if(boss.skillTimer<=0){
+      const roll=Math.floor(Math.random()*3);
+      if(roll===0){
+        for(let i=-1;i<=1;i++){
+          const dx=(player.x+player.w/2)-(boss.x+62);
+          bossProjectiles.push({
+            x:boss.x+62,y:GROUND-80+i*23,
+            vx:Math.sign(dx||-1)*(260+Math.abs(i)*35),
+            vy:i*75,life:4.2,r:14,kind:"fire"
           });
         }
-      }
-      if(boss.deathTimer>0){
-        boss.deathTimer-=dt;
-        boss.deathParticles.forEach(p=>{
-          p.x+=p.vx*dt*60;
-          p.y+=p.vy*dt*60;
-          p.vy+=0.4*dt*60;
-          p.vx*=0.99;
-          p.life-=dt;
+        say("🔥 邪恶团子：三连暗影火球！");
+      }else if(roll===1){
+        bossProjectiles.push({
+          x:boss.x-80,y:GROUND-15,vx:player.x<boss.x?-360:360,
+          vy:0,life:4.5,r:20,kind:"wave"
         });
-        boss.deathParticles=boss.deathParticles.filter(p=>p.life>0);
+        say("⚡ 地面冲击波！跳起来躲开！");
+      }else{
+        boss.charge=0.72;
+        boss.chargeDir=player.x<boss.x?-1:1;
+        say("💢 邪恶团子正在蓄力冲锋！快躲开！");
       }
+      boss.skillTimer=3.4+Math.random()*1.0;
     }
-
-    // ---- 弹幕统一更新（Boss 死亡后残留弹幕继续飞完） ----
     bossProjectiles.forEach(p=>{
       p.x+=p.vx*dt;
       p.y+=(p.vy||0)*dt;
-      if(p.kind==="fire"){
-        // 火球轻微追踪玩家，但前摇足够长，可以横向跑开
-        const targetX=player.x+player.w/2;
-        const targetY=player.y+player.h/2;
-        const dx=targetX-p.x, dy=targetY-p.y;
-        const dist=Math.hypot(dx,dy)||1;
-        const steer=68;
-        p.vx+=dx/dist*steer*dt;
-        p.vy+=dy/dist*steer*dt;
-        const sp=Math.hypot(p.vx,p.vy);
-        const cap=380;
-        if(sp>cap){
-          p.vx=p.vx/sp*cap;
-          p.vy=p.vy/sp*cap;
-        }
-      }
       p.life-=dt;
       const hitX=Math.abs(player.x+player.w/2-p.x)<(p.r||14)+22;
       const hitY=Math.abs(player.y+player.h/2-p.y)<(p.r||14)+27;
       if(hitX&&hitY){
-        if(p.kind==="wave" && player.y+player.h<GROUND-26){
+        if(p.kind==="wave" && player.y+player.h<GROUND-22){
           // 跳过冲击波
         }else hit();
         p.life=0;
       }
     });
     bossProjectiles=bossProjectiles.filter(p=>p.life>0);
+    if(Math.abs(player.x-boss.x)<92&&player.y+player.h>GROUND-125)hit();
   }
-
   if(player.y>H+80){
     hit();
     player.y=GROUND-player.h;
@@ -1144,109 +975,48 @@ function completeStage(){
   }
   ;
   document.getElementById("stageTitle").textContent="第"+level+"关完成！";
-  document.getElementById("stageText").textContent=level===4?"机关打开了！你成功破解谜题，准备迎接最终 Boss！":level===5?"邪恶团子已经被击败！":"太棒了！准备进入下一关！";
-  document.getElementById("nextStage").textContent=level===5?"查看通关结果":"进入第"+(level+1)+"关";
+  document.getElementById("stageText").textContent=level===4?"机关打开了！你成功破解谜题，邪恶团子正在前方等你！":level===5?"邪恶团子已经被击败！终极邪眼即将降临！":level===6?"邪眼已被彻底击败！团子世界恢复和平！":"太棒了！准备进入下一关！";
+  document.getElementById("nextStage").textContent=level===6?"查看通关结果":"进入第"+(level+1)+"关";
   showPanel("stagePanel");
 }
 function drawDango(){
   const x=player.x-scroll,y=player.y;
   if(invincible>0&&Math.floor(frame/7)%2===0)return;
-  ctx.save();
-  ctx.translate(x+27,y+28);
-  if(fuel>0){
-    ctx.fillStyle="#667e91";
-    ctx.fillRect(-34,-8,12,29);
-    ctx.fillStyle="#ff9d3b";
-    ctx.beginPath();
-    ctx.moveTo(-34,20);
-    ctx.lineTo(-28,37+Math.random()*4);
-    ctx.lineTo(-22,20);
-    ctx.fill();
-  }
-  ctx.strokeStyle="#65cba8";
-  ctx.lineWidth=10;
-  ctx.lineCap="round";
-  ctx.beginPath();
-  ctx.moveTo(-12,-19);
-  ctx.quadraticCurveTo(-39,-48,-44,-65);
-  ctx.moveTo(12,-19);
-  ctx.quadraticCurveTo(39,-48,44,-65);
-  ctx.stroke();
-  ctx.fillStyle="#a5f2d7";
-  ctx.beginPath();
-  ctx.arc(-44,-65,9,0,7);
-  ctx.arc(44,-65,9,0,7);
-  ctx.fill();
-  ctx.fillStyle=equipped==="gold"?"#f5c84c":"#83e0bd";
-  ctx.strokeStyle="#389c80";
-  ctx.lineWidth=3;
-  ctx.beginPath();
-  ctx.ellipse(0,0,27,29,0,0,7);
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle="#83e0bd";
-  ctx.beginPath();
-  ctx.ellipse(-30,8,8,11,-.5,0,7);
-  ctx.ellipse(30,8,8,11,.5,0,7);
-  ctx.fill();
-  ctx.fillStyle="#389c80";
-  ctx.beginPath();
-  ctx.ellipse(-13,27,9,6,0,0,7);
-  ctx.ellipse(13,27,9,6,0,0,7);
-  ctx.fill();
-  ctx.fillStyle="#233b3b";
-  ctx.beginPath();
-  ctx.arc(-10,-5,3.5,0,7);
-  ctx.arc(10,-5,3.5,0,7);
-  ctx.fill();
-  ctx.fillStyle="#ff9eb9";
-  ctx.beginPath();
-  ctx.ellipse(-19,8,5,3,0,0,7);
-  ctx.ellipse(19,8,5,3,0,0,7);
-  ctx.fill();
-  if(equipped==="crown"){
-    ctx.font="27px Arial";
-    ctx.fillText("👑",-14,-29);
-  }
-  if(equipped==="glasses"){
-    ctx.font="23px Arial";
-    ctx.fillText("🕶️",-14,5);
-  }
-  if(equipped==="flower"){
-    ctx.font="24px Arial";
-    ctx.fillText("🌸",-13,-29);
-  }
+  ctx.save();ctx.translate(x+27,y+29);if(player.facing<0)ctx.scale(-1,1);
+  // 火箭背包
+  if(fuel>0){ctx.fillStyle="#4c607b";ctx.fillRect(-39,-5,14,31);ctx.fillStyle="#ff9d3b";ctx.beginPath();ctx.moveTo(-38,23);ctx.quadraticCurveTo(-45,40,-31,43);ctx.quadraticCurveTo(-26,31,-27,23);ctx.fill();ctx.fillStyle="#fff2a8";ctx.fillRect(-34,24,5,11);}
+  // 触角与发光触角尖
+  ctx.strokeStyle="#d979ae";ctx.lineWidth=5;ctx.lineCap="round";ctx.beginPath();
+  ctx.moveTo(-12,-21);ctx.quadraticCurveTo(-27,-44,-28,-58);ctx.moveTo(12,-21);ctx.quadraticCurveTo(27,-44,28,-58);ctx.stroke();
+  ctx.fillStyle="#ffe0f0";ctx.beginPath();ctx.arc(-28,-58,7,0,Math.PI*2);ctx.arc(28,-58,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ff8fc6";ctx.beginPath();ctx.arc(-28,-58,3,0,Math.PI*2);ctx.arc(28,-58,3,0,Math.PI*2);ctx.fill();
+  // 身体渐变
+  const g=ctx.createRadialGradient(-10,-12,4,0,2,36);g.addColorStop(0,"#fff0fa");g.addColorStop(.5,equipped==="gold"?"#ffe18a":"#ffb7dc");g.addColorStop(1,equipped==="gold"?"#e6a92d":"#dc6da9");
+  ctx.fillStyle=g;ctx.strokeStyle="#a9437e";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,0,29,31,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // 小手小脚
+  ctx.fillStyle="#f39ac8";ctx.beginPath();ctx.ellipse(-30,8,8,12,-.4,0,Math.PI*2);ctx.ellipse(30,8,8,12,.4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#b94f89";ctx.beginPath();ctx.ellipse(-13,28,9,6,0,0,Math.PI*2);ctx.ellipse(13,28,9,6,0,0,Math.PI*2);ctx.fill();
+  // 眼睛带高光
+  ctx.fillStyle="#39233d";ctx.beginPath();ctx.ellipse(-10,-5,4,6,0,0,Math.PI*2);ctx.ellipse(10,-5,4,6,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-11,-7,1.5,0,Math.PI*2);ctx.arc(9,-7,1.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ff7fae";ctx.beginPath();ctx.ellipse(-19,8,6,3,0,0,Math.PI*2);ctx.ellipse(19,8,6,3,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="#a9437e";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,8,5,.2,Math.PI-.2);ctx.stroke();
+  if(equipped==="crown"){ctx.font="27px Arial";ctx.fillText("👑",-14,-31);}if(equipped==="glasses"){ctx.font="23px Arial";ctx.fillText("🕶️",-14,5);}if(equipped==="flower"){ctx.font="24px Arial";ctx.fillText("🌸",-13,-31);}
   ctx.restore();
 }
 function drawOctopus(o){
   const x=o.x-scroll,y=o.baseY+Math.sin(frame*.035+o.phase)*29;
-  ctx.save();
-  ctx.translate(x,y);
-  ctx.strokeStyle="#9a69d9";
-  ctx.lineWidth=9;
-  ctx.lineCap="round";
-  for(let i=0;i<6;i++){
-    let a=i*Math.PI/3;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a)*16,Math.sin(a)*16);
-    ctx.quadraticCurveTo(Math.cos(a)*40,Math.sin(a)*40+9,Math.cos(a)*37,Math.sin(a)*37+12);
-    ctx.stroke();
-  }
-  ctx.fillStyle="#9a69d9";
-  ctx.beginPath();
-  ctx.arc(0,0,26,0,7);
-  ctx.fill();
-  ctx.fillStyle="white";
-  ctx.beginPath();
-  ctx.arc(-9,-5,7,0,7);
-  ctx.arc(9,-5,7,0,7);
-  ctx.fill();
-  ctx.fillStyle="#222";
-  ctx.beginPath();
-  ctx.arc(-9,-5,3,0,7);
-  ctx.arc(9,-5,3,0,7);
-  ctx.fill();
-  ctx.restore();
+  ctx.save();ctx.translate(x,y);
+  // 摆动触手与吸盘
+  for(let i=0;i<8;i++){const a=i*Math.PI/4;const sway=Math.sin(frame*.07+i+o.phase)*8;ctx.strokeStyle=i%2?"#713b9f":"#9b5bd0";ctx.lineWidth=10;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(Math.cos(a)*14,Math.sin(a)*14);ctx.quadraticCurveTo(Math.cos(a)*38+sway,Math.sin(a)*38+8,Math.cos(a)*48+sway,Math.sin(a)*47+12);ctx.stroke();ctx.fillStyle="#d6a4ff";for(let k=1;k<=3;k++){ctx.beginPath();ctx.arc(Math.cos(a)*(18+k*8)+sway*.35,Math.sin(a)*(18+k*8)+8,2.5,0,Math.PI*2);ctx.fill();}}
+  // 头部阴影与高光
+  const g=ctx.createRadialGradient(-9,-13,3,0,0,35);g.addColorStop(0,"#d9a8ff");g.addColorStop(.55,"#8e4ac0");g.addColorStop(1,"#3c174f");ctx.fillStyle=g;ctx.strokeStyle="#2c123d";ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,30,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // 小角
+  ctx.fillStyle="#4a1b63";ctx.beginPath();ctx.moveTo(-19,-21);ctx.lineTo(-28,-42);ctx.lineTo(-7,-29);ctx.moveTo(19,-21);ctx.lineTo(28,-42);ctx.lineTo(7,-29);ctx.fill();
+  // 眼白和红瞳
+  ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(-10,-4,8,10,-.15,0,Math.PI*2);ctx.ellipse(10,-4,8,10,.15,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ff365e";ctx.beginPath();ctx.arc(-9,-3,4.5,0,Math.PI*2);ctx.arc(11,-3,4.5,0,Math.PI*2);ctx.fill();ctx.fillStyle="#160b20";ctx.beginPath();ctx.arc(-9,-3,2,0,Math.PI*2);ctx.arc(11,-3,2,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="#2a102f";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-8,14);ctx.quadraticCurveTo(0,19,9,13);ctx.stroke();ctx.restore();
 }
 function drawCoin(c){
   const x=c.x-scroll;
@@ -1290,41 +1060,13 @@ function draw(){
   platforms.forEach(p=>{
     ctx.fillStyle="#b78354";ctx.fillRect(p.x-scroll,p.y,p.w,p.h);ctx.fillStyle="#7bd28e";ctx.fillRect(p.x-scroll,p.y,p.w,6);
   });
-
-  // ============================================================
-  // 绘制障碍物 + 尖刺失效视觉反馈
-  // ============================================================
   obstacles.forEach(o=>{
-    let x=o.x-scroll,y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
-    if(o.type==="spike"){
-      if(o.disabledTimer>0){
-        // 失效的尖刺：灰色半透明 + 倒计时
-        ctx.save();
-        ctx.globalAlpha=0.45;
-        ctx.fillStyle="#9aa6b8";
-        ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
-        ctx.restore();
-        // 失效光晕
-        ctx.save();
-        ctx.globalAlpha=0.25+Math.sin(frame*.15)*.10;
-        ctx.fillStyle="#c8ffe8";
-        ctx.beginPath();ctx.ellipse(x+o.w/2,GROUND-6,o.w*0.75,14,0,0,7);ctx.fill();
-        ctx.restore();
-        // 倒计时文字
-        ctx.fillStyle="#c8ffe8";
-        ctx.font="bold 12px Arial";
-        ctx.textAlign="center";
-        ctx.fillText("尖刺失效 "+o.disabledTimer.toFixed(1)+"s",x+o.w/2,y-8);
-        ctx.textAlign="left";
-      }else{
-        ctx.fillStyle="#ed4769";
-        ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
-      }
+    let x=o.x-scroll,y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);if(o.type==="spike"){
+      ctx.fillStyle="#ed4769";ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
     }else{
       ctx.fillStyle="#dc783e";ctx.fillRect(x,y,o.w,o.h);
     }
   });
-
   gold.forEach(c=>{
     if(!c.got)drawCoin(c);
   });
@@ -1334,34 +1076,17 @@ function draw(){
   });
   if(level===4){
     // 箱子和传感器
-    const crateLeft=crate.x-scroll;
-    const crateTop=GROUND-crate.h;
     ctx.fillStyle="#c18a4c";
-    ctx.fillRect(crateLeft,crateTop,crate.w,crate.h);
+    ctx.fillRect(crate.x-scroll,GROUND-crate.h,crate.w,crate.h);
     ctx.strokeStyle="#744a28";
     ctx.lineWidth=4;
-    ctx.strokeRect(crateLeft,crateTop,crate.w,crate.h);
+    ctx.strokeRect(crate.x-scroll,GROUND-crate.h,crate.w,crate.h);
     ctx.beginPath();
-    ctx.moveTo(crateLeft+7,GROUND-7);
-    ctx.lineTo(crateLeft+crate.w-7,crateTop+7);
-    ctx.moveTo(crateLeft+crate.w-7,GROUND-7);
-    ctx.lineTo(crateLeft+7,crateTop+7);
+    ctx.moveTo(crate.x-scroll+7,GROUND-7);
+    ctx.lineTo(crate.x-scroll+crate.w-7,GROUND-crate.h+7);
+    ctx.moveTo(crate.x-scroll+crate.w-7,GROUND-7);
+    ctx.lineTo(crate.x-scroll+7,GROUND-crate.h+7);
     ctx.stroke();
-    // 推动瞬间的高亮反馈：让玩家确认箱子确实被推动了
-    if(crate.pushFlash>0){
-      ctx.save();
-      ctx.globalAlpha=Math.min(1,crate.pushFlash/12);
-      ctx.strokeStyle="#fff0a8";
-      ctx.lineWidth=3;
-      ctx.strokeRect(crateLeft-3,crateTop-3,crate.w+6,crate.h+6);
-      ctx.restore();
-    }
-    // 松开冷却提示
-    if(noPushTimer>0){
-      ctx.fillStyle="rgba(183,216,255,.85)";
-      ctx.font="bold 15px Arial";
-      ctx.fillText("🖐️ 箱子已松开",crateLeft-20,crateTop-16);
-    }
     ctx.fillStyle=doorOpen?"#5de49b":"#e45b70";
     ctx.fillRect(sensor.x-scroll,GROUND-12,sensor.w,12);
     ctx.fillStyle="#fff";
@@ -1391,122 +1116,48 @@ function draw(){
     ctx.font="13px Arial";
     if(player.x < -170)ctx.fillText("继续往回走！",-385-scroll,GROUND-57);
   }
-  if(level===5){
+  if(level===5 && false){
     const bx=boss.x-scroll,by=GROUND-146;
-
-    if(boss.hp>0){
-      // ============ Boss 存活：正常绘制 ============
-      const rage=boss.hp<boss.maxHp*0.35;
-      ctx.save();
-      ctx.globalAlpha=0.22+Math.sin(frame*.12)*.06;
-      ctx.fillStyle=rage?"#ff334f":"#9b42d6";
-      ctx.beginPath();ctx.ellipse(bx+62,GROUND-48,88,24,0,0,7);ctx.fill();
-      ctx.restore();
-      ctx.fillStyle=boss.flash>0?"#fff":(rage?"#d83c55":"#8751a8");
-      ctx.beginPath();ctx.ellipse(bx+62,by+93,68,72,0,0,7);ctx.fill();
-      ctx.fillStyle="#572b75";
-      ctx.beginPath();
-      ctx.ellipse(bx+34,by+27,17,35,-.4,0,7);
-      ctx.ellipse(bx+90,by+27,17,35,.4,0,7);
-      ctx.fill();
-      ctx.fillStyle="#fff";
-      ctx.beginPath();ctx.arc(bx+39,by+79,15,0,7);ctx.arc(bx+85,by+79,15,0,7);ctx.fill();
-      ctx.fillStyle="#26172e";
-      ctx.beginPath();ctx.arc(bx+42,by+80,7,0,7);ctx.arc(bx+88,by+80,7,0,7);ctx.fill();
-      ctx.strokeStyle="#2b1538";ctx.lineWidth=8;ctx.lineCap="round";
-      ctx.beginPath();ctx.moveTo(bx+45,by+119);ctx.quadraticCurveTo(bx+62,by+132,bx+82,by+118);ctx.stroke();
-      ctx.fillStyle="#f5c84c";ctx.beginPath();
-      ctx.moveTo(bx+20,by+31);ctx.lineTo(bx+25,by-3);ctx.lineTo(bx+46,by+17);
-      ctx.lineTo(bx+62,by-12);ctx.lineTo(bx+78,by+17);ctx.lineTo(bx+100,by-3);
-      ctx.lineTo(bx+105,by+31);ctx.closePath();ctx.fill();
-      ctx.fillStyle="#e64c68";ctx.fillRect(bx+3,by+139,118,16);
-
-      // ---- Boss 前摇视觉预警 ----
-      if(boss.telegraph>0){
-        const prog=1-(boss.telegraph/(boss.telegraphKind==="charge"?1.75:boss.telegraphKind==="fire"?1.55:1.35));
-        ctx.save();
-        ctx.globalAlpha=0.28+Math.sin(frame*.2)*.10;
-        if(boss.telegraphKind==="fire"){
-          ctx.fillStyle="#ff6b4a";
-          ctx.beginPath();
-          ctx.ellipse(bx+62,by+80,70+prog*20,80+prog*20,0,0,7);
-          ctx.fill();
-        }else if(boss.telegraphKind==="wave"){
-          ctx.fillStyle="#f7b83e";
-          ctx.fillRect(0,GROUND-8,W,8);
-        }else if(boss.telegraphKind==="charge"){
-          ctx.fillStyle="#ff334f";
-          ctx.fillRect(0,GROUND-18,W,18);
-        }
-        ctx.restore();
-
-        ctx.fillStyle="#fff";
-        ctx.font="bold 20px Arial";
-        ctx.textAlign="center";
-        if(boss.telegraphKind==="fire")ctx.fillText("⚠ 暗影火球蓄力中",W/2,GROUND-58);
-        else if(boss.telegraphKind==="wave")ctx.fillText("⚠ 冲击波预警",W/2,GROUND-58);
-        else if(boss.telegraphKind==="charge")ctx.fillText("⚠ 冲锋方向锁定",W/2,GROUND-58);
-        ctx.textAlign="left";
-
-        if(boss.telegraphKind==="charge"){
-          ctx.strokeStyle="#ff5266";
-          ctx.lineWidth=4;
-          ctx.setLineDash([12,8]);
-          ctx.beginPath();
-          ctx.moveTo(bx+62,GROUND-30);
-          ctx.lineTo(bx+62+boss.telegraphDir*260,GROUND-30);
-          ctx.stroke();
-          ctx.setLineDash([]);
-        }
-      }
-
-      if(boss.charge>0){
-        ctx.fillStyle="rgba(255,55,75,.28)";ctx.fillRect(0,GROUND-30,W,30);
-        ctx.fillStyle="#ff5266";ctx.font="bold 18px Arial";
-        ctx.fillText("⚠ BOSS 冲锋！",W/2-70,GROUND-42);
-      }
-    } else {
-      // ============ Boss 死亡：爆炸粒子 + 余烬 ============
-      boss.deathParticles.forEach(p=>{
-        ctx.save();
-        const alpha=Math.max(0,Math.min(1,p.life));
-        ctx.globalAlpha=alpha;
-        ctx.fillStyle=p.color;
-        ctx.beginPath();
-        ctx.arc(p.x-scroll,p.y,Math.max(1,p.size*Math.min(1,p.life)),0,7);
-        ctx.fill();
-        ctx.restore();
-      });
-      // 地面焦痕
-      ctx.save();
-      ctx.globalAlpha=Math.min(0.6,boss.deathTimer);
-      ctx.fillStyle="#2a1530";
-      ctx.beginPath();
-      ctx.ellipse(bx+62,GROUND-4,80,10,0,0,7);
-      ctx.fill();
-      ctx.restore();
+    const rage=boss.hp<boss.maxHp*0.35;
+    ctx.save();
+    ctx.globalAlpha=0.22+Math.sin(frame*.12)*.06;
+    ctx.fillStyle=rage?"#ff334f":"#9b42d6";
+    ctx.beginPath();ctx.ellipse(bx+62,GROUND-48,88,24,0,0,7);ctx.fill();
+    ctx.restore();
+    ctx.fillStyle=boss.flash>0?"#fff":(rage?"#d83c55":"#8751a8");
+    ctx.beginPath();ctx.ellipse(bx+62,by+93,68,72,0,0,7);ctx.fill();
+    ctx.fillStyle="#572b75";
+    ctx.beginPath();
+    ctx.ellipse(bx+34,by+27,17,35,-.4,0,7);
+    ctx.ellipse(bx+90,by+27,17,35,.4,0,7);
+    ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.beginPath();ctx.arc(bx+39,by+79,15,0,7);ctx.arc(bx+85,by+79,15,0,7);ctx.fill();
+    ctx.fillStyle="#26172e";
+    ctx.beginPath();ctx.arc(bx+42,by+80,7,0,7);ctx.arc(bx+88,by+80,7,0,7);ctx.fill();
+    ctx.strokeStyle="#2b1538";ctx.lineWidth=8;ctx.lineCap="round";
+    ctx.beginPath();ctx.moveTo(bx+45,by+119);ctx.quadraticCurveTo(bx+62,by+132,bx+82,by+118);ctx.stroke();
+    ctx.fillStyle="#f5c84c";ctx.beginPath();
+    ctx.moveTo(bx+20,by+31);ctx.lineTo(bx+25,by-3);ctx.lineTo(bx+46,by+17);
+    ctx.lineTo(bx+62,by-12);ctx.lineTo(bx+78,by+17);ctx.lineTo(bx+100,by-3);
+    ctx.lineTo(bx+105,by+31);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#e64c68";ctx.fillRect(bx+3,by+139,118,16);
+    if(boss.charge>0){
+      ctx.fillStyle="rgba(255,55,75,.28)";ctx.fillRect(0,GROUND-30,W,30);
+      ctx.fillStyle="#ff5266";ctx.font="bold 18px Arial";
+      ctx.fillText("⚠ BOSS 冲锋！",W/2-70,GROUND-42);
     }
-
-    // ---- 弹幕绘制（Boss 死亡后残留弹幕继续画完） ----
     bossProjectiles.forEach(p=>{
       ctx.fillStyle=p.kind==="wave"?"#f7b83e":"#e65d52";
       ctx.beginPath();
-      if(p.kind==="wave")ctx.ellipse(p.x-scroll,p.y,26,13,0,0,7);
+      if(p.kind==="wave")ctx.ellipse(p.x-scroll,p.y,25,12,0,0,7);
       else ctx.arc(p.x-scroll,p.y,p.r||14,0,7);
       ctx.fill();
     });
-
-    // ---- 血条 UI ----
     ctx.fillStyle="rgba(25,17,38,.88)";ctx.fillRect(12,10,W-24,42);
     ctx.fillStyle="#fff";ctx.font="bold 17px Arial";
     ctx.fillText("👑 邪恶团子 · 最终 Boss",24,29);
-    ctx.textAlign="right";
-    if(boss.hp>0){
-      ctx.fillText(Math.ceil(boss.hp)+" / "+boss.maxHp,W-24,29);
-    }else{
-      ctx.fillStyle="#a9f0d0";
-      ctx.fillText("已击败",W-24,29);
-    }
+    ctx.textAlign="right";ctx.fillText(Math.ceil(boss.hp)+" / "+boss.maxHp,W-24,29);
     ctx.textAlign="left";
     ctx.fillStyle="#49314f";ctx.fillRect(24,35,W-48,10);
     const hpw=(W-48)*Math.max(0,boss.hp/boss.maxHp);
@@ -1514,12 +1165,7 @@ function draw(){
     grad.addColorStop(0,"#ff334f");grad.addColorStop(1,"#ffb347");
     ctx.fillStyle=grad;ctx.fillRect(24,35,hpw,10);
     ctx.fillStyle="#fff";ctx.font="bold 15px Arial";
-    if(boss.hp>0){
-      ctx.fillText("普通攻击 -5　传奇大葱 -15",20,76);
-    }else{
-      ctx.fillStyle="#a9f0d0";
-      ctx.fillText("走到终点完成关卡！",20,76);
-    }
+    ctx.fillText("普攻有间隔　蓄力必杀 -70",20,76);
   }
   // 终点
   const finish=LEVEL_LENGTH-scroll;
@@ -1555,13 +1201,19 @@ function bindHold(id,key){
 bindHold("left","left");
 bindHold("right","right");
 bindHold("jump","jump");
+const onionSkillButton=document.getElementById("onionSkill");
+onionSkillButton.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  if(!hasOnion){say("先在第四关打开隐藏宝箱，获得传奇大葱！");return;}
+  onionSkillButton.setPointerCapture?.(e.pointerId);
+  startOnionCharge();
+});
+const endOnionPointer=()=>{if(onionCharging)stopOnionCharge();};
+onionSkillButton.addEventListener("pointerup",endOnionPointer);
+onionSkillButton.addEventListener("pointercancel",endOnionPointer);
+onionSkillButton.addEventListener("lostpointercapture",endOnionPointer);
 document.getElementById("attack").addEventListener("pointerdown",e=>{
   e.preventDefault();attack();
-});
-/* 「🖐️ 松开箱子」按钮 */
-document.getElementById("release").addEventListener("click",e=>{
-  e.preventDefault();
-  releaseCrate();
 });
 window.addEventListener("keydown",e=>{
   if(["ArrowLeft","ArrowRight","ArrowUp","Space"].includes(e.code))e.preventDefault();
@@ -1571,7 +1223,7 @@ window.addEventListener("keydown",e=>{
     if(!holding.jump)jump();holding.jump=true;
   }
   if(e.code==="KeyJ")attack();
-  if(e.code==="KeyR")releaseCrate();
+  if(e.code==="KeyL"&&!e.repeat)startOnionCharge();
   if(e.code==="Escape"&&state==="play"){
     state="paused";previousState="play";showPanel("rulesPanel");
   }
@@ -1580,8 +1232,10 @@ window.addEventListener("keyup",e=>{
   if(e.code==="ArrowLeft"||e.code==="KeyA")holding.left=false;
   if(e.code==="ArrowRight"||e.code==="KeyD")holding.right=false;
   if(e.code==="ArrowUp"||e.code==="Space"||e.code==="KeyW")holding.jump=false;
+  if(e.code==="KeyL"&&onionCharging)stopOnionCharge();
 });
 window.addEventListener("blur",()=>{
+  if(onionCharging)stopOnionCharge();
   holding={
     left:false,right:false,jump:false
   };
@@ -1674,6 +1328,108 @@ window.tuanziGame={
   })
 }
 ;
+
+// ===== 第六关：终极邪眼系统（在前五关成熟玩法基础上扩展） =====
+const baseUpdate=update;
+const baseDraw=draw;
+function damageFinalPlayer(amount,reason){
+  if(finalInvuln>0||state!=="play")return;
+  finalHp=Math.max(0,finalHp-amount);finalInvuln=.55;
+  player.vy=-5.2;player.vx=player.x<finalBoss.x?-3.5:3.5;
+  document.getElementById("playerHp").textContent=Math.ceil(finalHp);
+  say(reason||"邪眼攻击命中！注意躲避！");
+  if(finalHp<=0){state="lose";document.getElementById("endIcon").textContent="💀";document.getElementById("endTitle").textContent="被邪眼吞噬！";document.getElementById("endText").textContent="团子倒在了最终战场。调整策略，再来挑战邪眼吧！";showPanel("ending");}
+}
+function updateFinalBoss(dt){
+  if(!finalBoss.active||state!=="play")return;
+  finalTime+=dt;if(finalInvuln>0)finalInvuln=Math.max(0,finalInvuln-dt);if(finalBoss.flash>0)finalBoss.flash=Math.max(0,finalBoss.flash-dt);
+  // Boss缓慢浮动，狂暴后会向玩家压迫
+  finalBoss.y=245+Math.sin(finalTime*1.8)*(finalBoss.phase===2?28:15);
+  finalBoss.x=760+(finalBoss.phase===2?Math.sin(finalTime*1.4)*42:Math.sin(finalTime*.65)*18);
+  if(finalBoss.hp<=finalBoss.maxHp*.4&&finalBoss.phase===1&&!finalBoss.locked){finalBoss.hp=finalBoss.maxHp*.4;finalBoss.locked=true;finalBoss.dialog=3.6;say("邪眼：你竟然能伤到我？现在，见识真正的黑暗！");}
+  if(finalBoss.locked){finalBoss.dialog-=dt;if(finalBoss.dialog<=0){finalBoss.locked=false;finalBoss.phase=2;finalBoss.poisonTimer=1.1;finalBoss.protocolTimer=3.5;finalBoss.laserTimer=2.4;finalBoss.orbTimer=2.8;say("⚠ 邪眼进入狂暴形态！所有技能加速！");}return;}
+  const rage=finalBoss.phase===2;const mult=rage?1:1;
+  finalBoss.poisonTimer-=dt;finalBoss.protocolTimer-=dt;finalBoss.laserTimer-=dt;finalBoss.orbTimer-=dt;
+  if(finalBoss.poisonTimer<=0){finalBoss.poisonTimer=rage?2.4:4.8;finalBoss.poisonZones.push({x:Math.max(8,Math.min(820,player.x-52)),y:GROUND-4,w:145,timer:3.1});say("☠ 邪眼释放腐蚀毒雾！离开紫色区域！");}
+  if(finalBoss.protocolTimer<=0){finalBoss.protocolTimer=rage?5.0:8.5;player.isReversed=true;player.reverseTimer=rage?3.2:2.6;say("⛧ 黑暗协议展开！左右方向暂时反转！");}
+  if(finalBoss.laserTimer<=0){finalBoss.laserTimer=rage?3.2:5.6;finalBoss.lasers.push({y:Math.max(80,Math.min(GROUND-55,player.y+player.h/2)),state:"warn",timer:1.15});say("👁️ 斜眼激光锁定！立刻跳跃或移动！");}
+  if(finalBoss.orbTimer<=0){finalBoss.orbTimer=rage?3.0:5.2;const dx=(player.x+player.w/2)-finalBoss.x,dy=(player.y+player.h/2)-finalBoss.y;const len=Math.max(1,Math.hypot(dx,dy));finalBoss.orbs=finalBoss.orbs||[];finalBoss.orbs.push({x:finalBoss.x,y:finalBoss.y,vx:dx/len*260,vy:dy/len*260,life:4,r:15});say("🟣 邪眼发射追踪暗影球！");}
+  finalBoss.poisonZones.forEach(z=>{z.timer-=dt;if(player.x+player.w>z.x&&player.x<z.x+z.w&&player.y+player.h>GROUND-65)if(finalInvuln<=0)damageFinalPlayer(4,"☠ 毒雾正在腐蚀血量！快离开毒区！");});
+  finalBoss.poisonZones=finalBoss.poisonZones.filter(z=>z.timer>0);
+  finalBoss.lasers.forEach(l=>{l.timer-=dt;if(l.state==="warn"&&l.timer<=0){l.state="fire";l.timer=.48;}else if(l.state==="fire"){if(Math.abs(player.y+player.h/2-l.y)<27)damageFinalPlayer(28,"💥 斜眼激光命中！");}});
+  finalBoss.lasers=finalBoss.lasers.filter(l=>l.timer>0);
+  finalBoss.orbs=(finalBoss.orbs||[]).filter(o=>{o.x+=o.vx*dt;o.y+=o.vy*dt;o.life-=dt;if(Math.abs(player.x+player.w/2-o.x)<26&&Math.abs(player.y+player.h/2-o.y)<26){damageFinalPlayer(18,"🟣 暗影球击中了团子！");return false;}return o.life>0&&o.x>-40&&o.x<W+40;});
+  if(finalBoss.hp<=0){finalBoss.active=false;finalParticles.push({x:finalBoss.x,y:finalBoss.y,life:1.5,big:true});state="stage";completeStage();}
+}
+// 覆盖移动：第六关固定竞技场，反转效果只作用于方向输入
+update=function(dt){
+  if(state!=="play")return;
+  if(level===6){
+    const l=holding.left,r=holding.right;
+    if(player.isReversed){holding.left=r;holding.right=l;}
+    baseUpdate(dt);
+    holding.left=l;holding.right=r;
+    player.x=Math.max(0,Math.min(900-player.w,player.x));scroll=0;
+    updateFinalBoss(Math.min(dt,.035));
+    if(player.isReversed){player.reverseTimer-=dt;if(player.reverseTimer<=0)player.isReversed=false;}
+    if(finalBoss.active&&Math.abs(player.x+player.w/2-finalBoss.x)<92&&Math.abs(player.y+player.h/2-finalBoss.y)<72)if(finalInvuln<=0)damageFinalPlayer(5,"👁️ 邪眼的眼压正在伤害你！");
+    updateUI();
+  }else baseUpdate(dt);
+};
+function drawEvilDangoBoss(){
+  const bx=boss.x-scroll+30,by=GROUND-147;const rage=boss.hp<boss.maxHp*.35;ctx.save();ctx.translate(bx,by);
+  ctx.globalAlpha=.35;ctx.fillStyle=rage?"#ff163d":"#7b35b8";ctx.beginPath();ctx.ellipse(0,145,100,24,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+  // 触手背刺
+  ctx.strokeStyle=rage?"#7d092b":"#38134f";ctx.lineWidth=13;ctx.lineCap="round";for(let i=0;i<8;i++){let a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(Math.cos(a)*42,Math.sin(a)*42+70);ctx.quadraticCurveTo(Math.cos(a)*88,Math.sin(a)*75+90,Math.cos(a)*110,Math.sin(a)*100+105);ctx.stroke();}
+  const g=ctx.createRadialGradient(-20,-15,5,0,45,95);g.addColorStop(0,"#ffb1df");g.addColorStop(.55,rage?"#b62d63":"#873a9f");g.addColorStop(1,"#27102f");ctx.fillStyle=boss.flash>0?"#fff":g;ctx.strokeStyle="#1b1028";ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(0,58,76,84,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // 角冠
+  ctx.fillStyle="#24102f";ctx.beginPath();ctx.moveTo(-55,0);ctx.lineTo(-48,-55);ctx.lineTo(-18,-18);ctx.lineTo(0,-76);ctx.lineTo(20,-18);ctx.lineTo(51,-55);ctx.lineTo(56,0);ctx.closePath();ctx.fill();ctx.strokeStyle="#ffcf5a";ctx.lineWidth=4;ctx.stroke();
+  // 邪恶独眼
+  ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(0,45,42,31,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=rage?"#ff183c":"#9b32d5";ctx.beginPath();ctx.arc(0,45,23,0,Math.PI*2);ctx.fill();ctx.fillStyle="#130815";ctx.beginPath();ctx.ellipse(0,45,8,20,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-7,34,5,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="#220c2b";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-22,100);ctx.quadraticCurveTo(0,122,24,98);ctx.stroke();ctx.restore();
+  bossProjectiles.forEach(p=>{ctx.fillStyle=p.kind==="wave"?"#ffbd4b":"#ff6c8d";ctx.beginPath();if(p.kind==="wave")ctx.ellipse(p.x-scroll,p.y,25,12,0,0,Math.PI*2);else ctx.arc(p.x-scroll,p.y,p.r||14,0,Math.PI*2);ctx.fill();});
+  if(boss.charge>0){ctx.fillStyle="rgba(255,45,90,.22)";ctx.fillRect(0,GROUND-35,W,35);ctx.fillStyle="#ff7894";ctx.font="bold 18px Arial";ctx.textAlign="center";ctx.fillText("⚠ 邪恶团子冲锋！",W/2,GROUND-45);}
+  // 顶部Boss血条
+  ctx.fillStyle="rgba(18,8,28,.88)";ctx.fillRect(14,12,W-28,46);ctx.fillStyle="#fff";ctx.font="bold 18px Arial";ctx.textAlign="left";ctx.fillText("👑 邪恶团子 · 第五关Boss",28,32);ctx.textAlign="right";ctx.fillText(Math.ceil(boss.hp)+" / "+boss.maxHp,W-28,32);ctx.textAlign="left";ctx.fillStyle="#45213f";ctx.fillRect(28,40,W-56,9);const gr=ctx.createLinearGradient(28,0,W-28,0);gr.addColorStop(0,"#ff2c63");gr.addColorStop(1,"#ffb45b");ctx.fillStyle=gr;ctx.fillRect(28,40,(W-56)*Math.max(0,boss.hp/boss.maxHp),9);
+}
+function drawFinalArena(){
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#10051d");bg.addColorStop(.55,"#24102f");bg.addColorStop(1,"#090611");ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // 远景裂隙和浮尘
+  for(let i=0;i<9;i++){const x=(i*127+Math.sin(finalTime*1.2+i)*28)%W;ctx.strokeStyle="rgba(174,44,255,.18)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+Math.sin(i*4)*55,GROUND-10);ctx.stroke();}
+  for(let i=0;i<30;i++){const x=(i*71+finalTime*18)%W,y=(i*43+Math.sin(finalTime+i)*20)%GROUND;ctx.fillStyle="rgba(220,125,255,.35)";ctx.fillRect(x,y,2,2);}
+  ctx.fillStyle="#21102e";ctx.fillRect(0,GROUND,W,H-GROUND);ctx.fillStyle="#682d79";ctx.fillRect(0,GROUND,W,8);
+  // 腐蚀区
+  finalBoss.poisonZones.forEach(z=>{ctx.fillStyle="rgba(140,35,190,.34)";ctx.beginPath();ctx.ellipse(z.x+z.w/2,GROUND-8,z.w/2,30,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="rgba(203,84,255,.22)";ctx.fillRect(z.x,GROUND-18,z.w,12);});
+  // 激光预警/发射
+  finalBoss.lasers.forEach(l=>{if(l.state==="warn"){ctx.strokeStyle="rgba(255,65,95,.9)";ctx.lineWidth=4;ctx.setLineDash([12,10]);ctx.beginPath();ctx.moveTo(0,l.y);ctx.lineTo(W,l.y);ctx.stroke();ctx.setLineDash([]);}else{ctx.fillStyle="rgba(255,30,65,.82)";ctx.fillRect(0,l.y-23,W,46);ctx.fillStyle="#fff";ctx.fillRect(0,l.y-7,W,14);}});
+  // 邪眼主体：多层尖刺、触手、眼球
+  const x=finalBoss.x,y=finalBoss.y,rage=finalBoss.phase===2;ctx.save();ctx.translate(x,y);
+  ctx.globalAlpha=.35;ctx.fillStyle=rage?"#ff123f":"#8f36c9";ctx.beginPath();ctx.ellipse(0,115,150,30,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+  ctx.strokeStyle=rage?"#790b35":"#4b1d6a";ctx.lineWidth=17;ctx.lineCap="round";for(let i=0;i<10;i++){const a=i*Math.PI/5;const wob=Math.sin(finalTime*4+i)*9;ctx.beginPath();ctx.moveTo(Math.cos(a)*65,Math.sin(a)*65);ctx.quadraticCurveTo(Math.cos(a)*118+wob,Math.sin(a)*112,Math.cos(a)*155+wob,Math.sin(a)*143);ctx.stroke();}
+  ctx.fillStyle=rage?"#4a071d":"#281039";ctx.strokeStyle="#d94bff";ctx.lineWidth=5;ctx.beginPath();for(let i=0;i<20;i++){const a=i*Math.PI/10,rr=i%2?106:145;const px=Math.cos(a)*rr,py=Math.sin(a)*rr; if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.fill();ctx.stroke();
+  const shell=ctx.createRadialGradient(-30,-40,10,0,0,112);shell.addColorStop(0,"#d8b4ef");shell.addColorStop(.3,rage?"#a11c50":"#71369a");shell.addColorStop(1,"#17091f");ctx.fillStyle=finalBoss.flash>0?"#fff":shell;ctx.beginPath();ctx.arc(0,0,105,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#f078ff";ctx.lineWidth=5;ctx.stroke();
+  // 巨大斜眼眼白与红紫虹膜
+  ctx.fillStyle="#f4eaff";ctx.beginPath();ctx.ellipse(0,0,78,62,-.12,0,Math.PI*2);ctx.fill();ctx.fillStyle=rage?"#ff164b":"#b13bdf";ctx.beginPath();ctx.ellipse(8,4,45,48,.1,0,Math.PI*2);ctx.fill();ctx.fillStyle="#130817";ctx.beginPath();ctx.ellipse(14,4,13,38,.08,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-12,-20,13,0,Math.PI*2);ctx.arc(24,20,5,0,Math.PI*2);ctx.fill();
+  // 眼睑与邪恶眉
+  ctx.strokeStyle="#210b2d";ctx.lineWidth=13;ctx.beginPath();ctx.moveTo(-80,-38);ctx.quadraticCurveTo(0,-105,83,-42);ctx.stroke();ctx.restore();
+  // 暗影球
+  (finalBoss.orbs||[]).forEach(o=>{const gg=ctx.createRadialGradient(o.x-4,o.y-4,2,o.x,o.y,o.r);gg.addColorStop(0,"#fff");gg.addColorStop(.3,"#d58cff");gg.addColorStop(1,"#5d148e");ctx.fillStyle=gg;ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.fill();});
+  // Boss血条和阶段提示
+  ctx.fillStyle="rgba(10,4,20,.88)";ctx.fillRect(120,14,720,42);ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 20px Arial";ctx.fillText("👁️ 终极邪眼 · 最终Boss",480,31);ctx.fillStyle="#472044";ctx.fillRect(145,39,670,10);const hpw=670*Math.max(0,finalBoss.hp/finalBoss.maxHp);const gg=ctx.createLinearGradient(145,0,815,0);gg.addColorStop(0,"#ff174f");gg.addColorStop(1,"#d68aff");ctx.fillStyle=gg;ctx.fillRect(145,39,hpw,10);ctx.textAlign="left";ctx.font="bold 14px Arial";ctx.fillText("阶段："+(finalBoss.phase===2?"狂暴形态":"封印形态")+"　"+Math.ceil(finalBoss.hp)+" / "+finalBoss.maxHp,145,76);
+  if(finalBoss.locked){ctx.fillStyle="rgba(0,0,0,.76)";ctx.fillRect(110,365,740,70);ctx.strokeStyle="#ff4e87";ctx.lineWidth=2;ctx.strokeRect(110,365,740,70);ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 21px Arial";ctx.fillText("邪眼：你竟然能伤到我？现在，见识真正的黑暗！",480,407);}
+  // 玩家
+  drawDango();
+  // 闪避无敌提示
+  if(finalInvuln>0){ctx.strokeStyle="rgba(255,255,255,.65)";ctx.lineWidth=3;ctx.beginPath();ctx.arc(player.x+player.w/2,player.y+player.h/2,42,0,Math.PI*2);ctx.stroke();}
+  finalParticles=finalParticles.filter(p=>{p.life-=.016;if(!p.big){p.x+=p.vx*.016;p.y+=p.vy*.016;ctx.fillStyle="#f9a6ff";ctx.fillRect(p.x,p.y,4,4);}return p.life>0;});
+}
+draw=function(){
+  if(level!==6){baseDraw();if(level===5)drawEvilDangoBoss();return;}
+  drawFinalArena();
+};
+// 触屏松手按钮：避免推箱或移动时持续输入
+const releaseBtn=document.getElementById("release");if(releaseBtn)releaseBtn.onclick=()=>{holding.left=false;holding.right=false;holding.jump=false;player.vx=0;say("已松开操作键。");};
+
 makeLevel();
 updateUI();
 draw();
@@ -1688,7 +1444,7 @@ requestAnimationFrame(loop);
   "startAdventure", "welcomeTutorial", "tutorialStart", "welcomeShop", "welcomeDisclaimer",
   "shopBack", "rulesBack", "nextStage", "endingRestart", "endingShop",
   "endingHome", "disclaimerBack", "restart", "shopButton", "rulesButton",
-  "redeem", "disclaimerButton", "release"
+  "redeem", "disclaimerButton"
   ];
   menuButtonIds.forEach(function (id) {
     const element = document.getElementById(id);
