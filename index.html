@@ -167,6 +167,7 @@ input{
     font-size:20px
   }
   #onionSkill{width:132px;font-size:14px}
+  #ultimateSkill{width:125px;font-size:13px}
   .panel{
     padding:17px
   }
@@ -226,6 +227,8 @@ button:focus-visible, input:focus-visible {
 #attack {
   background: linear-gradient(180deg, #ffc0b7, #ff8e8e);
 }
+#ultimateSkill{width:132px;background:linear-gradient(180deg,#d9c4ff,#925bff);color:#fff;font-size:14px;border:2px solid #e2d3ff;box-shadow:0 0 16px rgba(157,95,255,.4)}
+#ultimateSkill:disabled{filter:grayscale(.65);opacity:.55}
 #onionSkill{width:138px;background:linear-gradient(180deg,#fff0a8,#ffb52e);color:#512b08;font-size:15px;border:2px solid #ffe7a0;box-shadow:0 0 14px rgba(255,190,55,.28)}
 #onionSkill.charging{background:linear-gradient(180deg,#fff7c7,#ff8b28);box-shadow:0 0 22px rgba(255,165,35,.75);animation:chargePulse .45s infinite alternate}
 #onionSkill:disabled{filter:grayscale(.65);opacity:.55}
@@ -303,7 +306,7 @@ footer {
 <h1>🍡 团子冒险世界</h1>
 <div class="info">
  <span id="livesContainer">❤️ 生命：<b id="lives">3</b></span>
- <span id="hpContainer" class="hidden">🩸 血量：<b id="playerHp">75</b>/75</span>
+ <span id="hpContainer" class="hidden">🩸 团子血量：<b id="playerHp">200</b>/<b id="playerMaxHp">200</b></span>
  <span>🪙 金币：<b id="coins">0</b></span>
  <span>🚀 火箭：<b id="fuel">无</b></span>
  <span>🗺️ 关卡：<b id="level">1</b>/6</span>
@@ -313,7 +316,7 @@ footer {
 <canvas id="game" width="960" height="540"></canvas>
 <div class="controls">
  <button id="left">⬅️</button><button id="jump">⬆️</button><button id="right">➡️</button>
- <button id="attack">⚔️ 普攻</button><button id="onionSkill" disabled>🥢 大葱蓄力</button><button id="release">🖐️</button>
+ <button id="attack">⚔️ 普攻</button><button id="onionSkill" disabled>🥢 大葱蓄力</button><button id="ultimateSkill" disabled>🌪️ 大招</button><button id="release">🖐️</button>
 </div>
 <div>
  <button id="restart">重新开始本关</button>
@@ -339,10 +342,10 @@ footer {
  </div>
  <div class="panel hidden" id="tutorial">
   <h2>📖 新手教程</h2>
-  <p>⬅️➡️ 左右移动，⬆️ 跳跃。长按跳跃键使用火箭背包（解锁后）。</p>
+  <p>⬅️➡️ 左右移动，⬆️ 跳跃。长按跳跃键使用火箭背包（解锁后）；J普攻、L蓄力、K释放大招。</p>
   <p>🪙 金币放在地面附近，走过去即可收集，不需要跳得很高。</p>
   <p>🐙 章鱼会移动并喷射墨弹。第四关推箱子压住传感器；第五关挑战邪恶团子；第六关迎战邪眼。</p>
-  <p>🥢 获得传奇大葱后，长按「大葱蓄力」3秒，自动释放70点伤害的必杀技；必杀技冷却4.5秒。</p>
+  <p>🥢 获得传奇大葱后，长按「大葱蓄力」2秒，获得3秒强化普攻（每次20点伤害）；「瞬斩大招」瞬移无敌4秒并造成400点伤害。</p>
   <p>🚀 作弊码：67mj，获得火箭背包。</p>
   <button id="tutorialStart">开始第一关</button>
  </div>
@@ -354,7 +357,7 @@ footer {
   <h2>📖 游戏规则</h2>
   <p>❤️ 前五关使用三条生命；⬅️➡️ 移动；⬆️ 跳跃和火箭飞行；🐙 章鱼会移动并喷墨；🪙 金币可购买装扮；第四关推箱解谜；第五关挑战邪恶团子。</p>
   <p>👁️ 第六关改为75点血量，邪眼会释放毒雾、方向反转和斜眼激光。Boss血量降至40%会锁血并进入剧情，随后狂暴。</p>
-  <p>🥢 传奇大葱：普通攻击有间隔；长按蓄力键3秒自动释放70点必杀伤害，冷却4.5秒。</p>
+  <p>🥢 传奇大葱：蓄力2秒后获得3秒强化普攻；瞬斩大招持续4秒、瞬移无敌并造成400点伤害。击败第五关Boss后基础属性永久提升50%。</p>
   <button id="rulesBack">返回</button>
  </div>
  <div class="panel hidden" id="stagePanel">
@@ -392,9 +395,20 @@ window.addEventListener("error",function(e){
   const m=document.getElementById("msg");if(m)m.textContent="游戏脚本出现异常，请刷新页面；错误："+(e.message||"未知错误");
 });
 const W=960,H=540,GROUND=435,LEVEL_LENGTH=2600;
-const FINAL_BOSS_MAX_HP=900;
-let finalBoss={active:false,x:760,y:245,hp:FINAL_BOSS_MAX_HP,maxHp:FINAL_BOSS_MAX_HP,phase:1,locked:false,dialog:0,poisonTimer:2.2,protocolTimer:6.5,laserTimer:4.2,poisonZones:[],lasers:[],orbTimer:5.5,flash:0};
-let finalHp=75,finalInvuln=0,finalTime=0,finalParticles=[];
+const FINAL_BOSS_MAX_HP=3000;
+let finalBoss={active:false,x:760,y:245,hp:FINAL_BOSS_MAX_HP,maxHp:FINAL_BOSS_MAX_HP,phase:1,locked:false,dialog:0,poisonTimer:2.2,protocolTimer:6.5,laserTimer:4.2,poisonWarn:0,protocolWarn:0,orbWarn:0,poisonX:0,poisonZones:[],lasers:[],orbTimer:5.5,flash:0};
+const BASE_PLAYER_HP=200;
+const BOSS_UPGRADE_KEY="tuanziBossUpgrade";
+let bossUpgrade=localStorage.getItem(BOSS_UPGRADE_KEY)==="yes";
+let playerMaxHp=BASE_PLAYER_HP*(bossUpgrade?1.5:1);
+let bossPlayerHp=playerMaxHp,finalHp=bossPlayerHp,finalInvuln=0,finalTime=0,finalParticles=[];
+let baseAttackDamage=10*(bossUpgrade?1.5:1);
+let chargedAttackDamage=20*(bossUpgrade?1.5:1);
+let chargedSkillDamage=70*(bossUpgrade?1.5:1);
+let ultimateDamage=400*(bossUpgrade?1.5:1);
+let ultimateDuration=4*(bossUpgrade?1.5:1);
+let ultimateCooldown=22,ultimateCooldownTimer=0,ultimateActive=false,ultimateTimer=0,ultimateLockX=100,ultimateLockY=GROUND-55,ultimateStartTime=0,ultimateHitDone=false;
+let chargeBuffTimer=0;
 let state="menu",level=1,lives=3,coins=Number(localStorage.getItem("tuanziCoins")||0);
 const MAX_FUEL=900;
 let scroll=0,fuel=0,cheated=localStorage.getItem("tuanziCheated")==="yes";
@@ -418,11 +432,12 @@ let crate={
 ;
 let doorOpen=false,chestOpened=localStorage.getItem("tuanziChestOpened")==="yes";
 let boss={
-  x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
+  x:2100,y:GROUND-146,hp:1200,maxHp:1200,attackTimer:1.15,flash:0,skillTimer:3.0,charge:0,chargeDir:-1,phase:0,windup:0,pendingSkill:0
 }
 ;
 let bossProjectiles=[],attackCooldown=0,toastFrames=0;
 let onionCharging=false,onionChargeTime=0,onionSkillCooldown=0,onionSkillReady=false;
+const ONION_CHARGE_SECONDS=2;
 const cosmetics=[
 {
   id:"normal",name:"原始团子",price:0,emoji:"🍡"
@@ -474,7 +489,9 @@ function updateUI(){
   document.getElementById("weaponInfo").textContent=hasOnion?"🥢 武器：传奇大葱":"🥢 武器：无";
   const onionBtn=document.getElementById("onionSkill");
   if(onionBtn){onionBtn.disabled=!hasOnion; if(!hasOnion){onionBtn.textContent="🥢 需传奇大葱";onionBtn.classList.remove("charging");}else if(!onionCharging){onionBtn.textContent=onionSkillCooldown>0?`🥢 冷却 ${onionSkillCooldown.toFixed(1)}s`:"🥢 长按蓄力";}}
-  if(level===6){document.getElementById("livesContainer").classList.add("hidden");document.getElementById("hpContainer").classList.remove("hidden");document.getElementById("playerHp").textContent=Math.ceil(finalHp);}
+  const ultBtn=document.getElementById("ultimateSkill");
+  if(ultBtn){ultBtn.disabled=!hasOnion||ultimateCooldownTimer>0||ultimateActive;ultBtn.textContent=ultimateActive?"🌪️ 斩击中":ultimateCooldownTimer>0?`🌪️ 冷却 ${ultimateCooldownTimer.toFixed(1)}s`:"🌪️ 瞬斩大招";}
+  if(level>=5){document.getElementById("livesContainer").classList.add("hidden");document.getElementById("hpContainer").classList.remove("hidden");document.getElementById("playerHp").textContent=Math.ceil(bossPlayerHp);document.getElementById("playerMaxHp").textContent=Math.ceil(playerMaxHp);}
   else{document.getElementById("livesContainer").classList.remove("hidden");document.getElementById("hpContainer").classList.add("hidden");}
 }
 function makeLevel(){
@@ -528,8 +545,9 @@ function makeLevel(){
     ];
   }
   if(level===5){
+    playerMaxHp=BASE_PLAYER_HP*(bossUpgrade?1.5:1);bossPlayerHp=playerMaxHp;finalHp=bossPlayerHp;finalInvuln=0;
     boss={
-      x:2100,y:GROUND-146,hp:260,maxHp:260,attackTimer:1.15,flash:0,skillTimer:2.8,charge:0,chargeDir:-1,phase:0
+      x:2100,y:GROUND-146,hp:1200,maxHp:1200,attackTimer:1.15,flash:0,skillTimer:3.0,charge:0,chargeDir:-1,phase:0,windup:0,pendingSkill:0
     }
     ;
     for(let i=0;i<10;i++)gold.push({
@@ -537,16 +555,17 @@ function makeLevel(){
     });
   }
   if(level===6){
-    finalBoss={active:true,x:760,y:245,hp:FINAL_BOSS_MAX_HP,maxHp:FINAL_BOSS_MAX_HP,phase:1,locked:false,dialog:0,poisonTimer:2.0,protocolTimer:6.5,laserTimer:4.0,poisonZones:[],lasers:[],orbTimer:5.2,flash:0};
-    finalHp=75;finalInvuln=0;finalTime=0;finalParticles=[];scroll=0;
+    playerMaxHp=BASE_PLAYER_HP*(bossUpgrade?1.5:1);bossPlayerHp=playerMaxHp;finalHp=bossPlayerHp;finalInvuln=0;
+    finalBoss={active:true,x:760,y:245,hp:FINAL_BOSS_MAX_HP,maxHp:FINAL_BOSS_MAX_HP,phase:1,locked:false,dialog:0,poisonTimer:2.0,protocolTimer:6.5,laserTimer:4.0,poisonWarn:0,protocolWarn:0,orbWarn:0,poisonX:0,poisonZones:[],lasers:[],orbTimer:5.2,flash:0};
+    finalHp=bossPlayerHp;finalInvuln=0;finalTime=0;finalParticles=[];scroll=0;
     platforms=[];obstacles=[];gold=[];octopus=[];ink=[];bossProjectiles=[];
-  } else {finalBoss.active=false;finalHp=75;}
+  } else {finalBoss.active=false;if(level<5){bossPlayerHp=playerMaxHp;finalHp=bossPlayerHp;}}
   player={
     x:100,y:GROUND-55,w:55,h:55,vx:0,vy:0,onGround:true,facing:1
   }
   ;
   invincible=0;
-  attackCooldown=0;onionCharging=false;onionChargeTime=0;onionSkillCooldown=0;onionSkillReady=false;
+  attackCooldown=0;onionCharging=false;onionChargeTime=0;onionSkillCooldown=0;onionSkillReady=false;chargeBuffTimer=0;ultimateActive=false;ultimateTimer=0;ultimateCooldownTimer=0;ultimateHitDone=false;
   updateUI();
 }
 function startGame(){
@@ -592,19 +611,17 @@ function finishGame(win){
   showPanel("ending");
 }
 function hit(){
-  if(invincible>0||state!=="play")return;
-  lives--;
+  if(invincible>0||ultimateActive||state!=="play")return;
   invincible=95;
   player.vy=-7;
   player.vx=-(player.facing||1)*2.5;
-  if(lives<=0){
-    lives=0;
-    updateUI();
-    say("本关三条生命用完，正在重新开始第"+level+"关……");
-    restartCurrentLevel();
-    return;
-  }
-  else{
+  if(level>=5){
+    bossPlayerHp=Math.max(0,bossPlayerHp-20);finalHp=bossPlayerHp;
+    say("受到重击！团子血量："+Math.ceil(bossPlayerHp)+"/"+Math.ceil(playerMaxHp));
+    if(bossPlayerHp<=0){state="lose";document.getElementById("endIcon").textContent="💔";document.getElementById("endTitle").textContent="团子倒下了！";document.getElementById("endText").textContent="Boss战失败，重新挑战并躲开攻击吧！";showPanel("ending");}
+  }else{
+    lives--;
+    if(lives<=0){lives=0;updateUI();say("本关三条生命用完，正在重新开始第"+level+"关……");restartCurrentLevel();return;}
     say("受到攻击！还剩 "+lives+" 条生命");
   }
   updateUI();
@@ -686,76 +703,108 @@ function jump(){
   }
 }
 function getBossTarget(){
-  if(level===6)return {x:finalBoss.x,y:finalBoss.y,reach:hasOnion?175:135};
-  if(level===5)return {x:boss.x+30,y:GROUND-147,reach:hasOnion?145:105};
+  if(level===6)return {x:finalBoss.x,y:finalBoss.y,reach:hasOnion?470:390};
+  if(level===5)return {x:boss.x+30,y:GROUND-147,reach:hasOnion?420:340};
   return null;
 }
 function hitBossWithOnionSkill(){
-  if(!hasOnion||state!=="play")return;
-  if(level!==5&&level!==6){say("🥢 大葱蓄力技只能对Boss使用！");return;}
-  if(onionSkillCooldown>0)return;
-  const target=getBossTarget();
-  const distance=Math.hypot((player.x+player.w/2)-target.x,(player.y+player.h/2)-target.y);
-  if(distance>target.reach+20){say("💥 大葱蓄力完成，但距离Boss太远，技能挥空了！");onionSkillCooldown=1.5;return;}
-  if(level===6){
-    if(finalBoss.locked||finalBoss.hp<=0){say("邪眼处于无敌阶段，暂时无法受到伤害！");onionSkillCooldown=1.5;return;}
-    finalBoss.hp=Math.max(finalBoss.maxHp*.4,finalBoss.hp-70);
-    finalBoss.flash=.32;
-    for(let i=0;i<20;i++)finalParticles.push({x:finalBoss.x,y:finalBoss.y,vx:(Math.random()-.5)*380,vy:(Math.random()-.5)*380,life:.7});
-  }else{
-    if(boss.hp<=0){say("邪恶团子已经被击败！");return;}
-    boss.hp=Math.max(0,boss.hp-70);boss.flash=24;
-    for(let i=0;i<16;i++)finalParticles.push({x:target.x,y:target.y,vx:(Math.random()-.5)*300,vy:(Math.random()-.5)*300,life:.55});
+  if(!hasOnion||state!=="play"||onionSkillCooldown>0)return;
+  // 蓄力成功后无论是否命中，都会获得3秒强化普攻。
+  chargeBuffTimer=3;
+  onionSkillCooldown=5.5;
+  let didHit=false;
+  if(level===5&&boss.hp>0){
+    const dx=(boss.x+30)-(player.x+player.w/2);
+    if(Math.abs(dx)<620){boss.hp=Math.max(0,boss.hp-chargedSkillDamage);boss.flash=26;didHit=true;}
+  }else if(level===6&&finalBoss.hp>0&&!finalBoss.locked){
+    const dx=finalBoss.x-(player.x+player.w/2);
+    if(Math.abs(dx)<650){finalBoss.hp=Math.max(finalBoss.maxHp*.4,finalBoss.hp-chargedSkillDamage);finalBoss.flash=.35;didHit=true;}
   }
-  onionSkillCooldown=4.5;
-  attackCooldown=Math.max(attackCooldown,18);
-  say("🌟 传奇大葱·蓄力必杀！造成 70 点伤害！");
+  say(didHit?`✨ 蓄力成功！命中造成 ${chargedSkillDamage} 点伤害，接下来3秒普攻强化！`:"✨ 蓄力成功！虽然没有命中敌人，但接下来3秒普攻强化！");
+  for(let i=0;i<18;i++)finalParticles.push({x:player.x+player.w/2,y:player.y+player.h/2,vx:(Math.random()-.5)*260,vy:(Math.random()-.5)*260,life:.55});
+  updateUI();
 }
 function startOnionCharge(){
-  if(state!=="play"||!hasOnion||onionSkillCooldown>0||onionCharging)return;
-  if(level!==5&&level!==6){say("🥢 传奇大葱蓄力技将在Boss关卡解锁使用！");return;}
+  if(state!=="play"||!hasOnion||onionSkillCooldown>0||onionCharging||ultimateActive)return;
+  if(level!==5&&level!==6){say("🥢 传奇大葱蓄力技将在Boss关卡使用！");return;}
   onionCharging=true;onionChargeTime=0;
   const b=document.getElementById("onionSkill");b.classList.add("charging");b.textContent="🥢 蓄力 0%";
-  say("🥢 传奇大葱开始蓄力！坚持3秒！");
+  say("🥢 传奇大葱开始蓄力！2秒后强化普攻！");
 }
 function stopOnionCharge(){
+  if(!onionCharging)return;
   onionCharging=false;
   const b=document.getElementById("onionSkill");
   b.classList.remove("charging");
-  if(onionChargeTime>=3){
+  if(onionChargeTime>=ONION_CHARGE_SECONDS){
     onionChargeTime=0;
     hitBossWithOnionSkill();
   }else if(onionChargeTime>0){
-    say("蓄力中断！需要持续按住3秒才能释放必杀技。");
+    say("蓄力中断！需要持续按住2秒。");
     onionChargeTime=0;
   }
   if(hasOnion&&onionSkillCooldown<=0)b.textContent="🥢 长按蓄力";
 }
 function attack(){
-  if(state!=="play"||attackCooldown>0)return;
-  attackCooldown=level===6?42:36; // 约0.7秒攻击间隔，避免连续点击秒杀Boss
+  if(state!=="play"||attackCooldown>0||ultimateActive)return;
+  attackCooldown=30; // 普攻间隔约0.5秒
   if(level===6){
-    const distance=Math.hypot((player.x+player.w/2)-finalBoss.x,(player.y+player.h/2)-finalBoss.y);
-    const reach=hasOnion?175:135;
-    if(distance<=reach&&!finalBoss.locked&&finalBoss.hp>0){
-      const damage=hasOnion?22:12;
+    const dx=Math.abs((player.x+player.w/2)-finalBoss.x);
+    const dy=Math.abs((player.y+player.h/2)-finalBoss.y);
+    const reach=hasOnion?390:300;
+    if(dx<=reach&&dy<=270&&!finalBoss.locked&&finalBoss.hp>0){
+      const damage=chargeBuffTimer>0?chargedAttackDamage:baseAttackDamage;
       finalBoss.hp=Math.max(finalBoss.maxHp*.4,finalBoss.hp-damage);
-      finalBoss.flash=.16;
-      say(hasOnion?"🥢 传奇大葱普通攻击！-22 HP":"普通攻击命中邪眼！-12 HP");
-      for(let i=0;i<8;i++)finalParticles.push({x:finalBoss.x,y:finalBoss.y,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220,life:.45});
+      finalBoss.flash=.18;
+      say(`大葱斩击命中邪眼！-${damage} HP${chargeBuffTimer>0?"（强化）":""}`);
+      for(let i=0;i<10;i++)finalParticles.push({x:finalBoss.x,y:finalBoss.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:.5});
     }else if(finalBoss.locked)say("邪眼正在展开黑暗协议，暂时无法受到伤害！");
-    else say("靠近邪眼一点再攻击！");
+    else say("攻击挥空！");
     return;
   }
   if(level!==5)return;
   const distance=Math.abs((player.x+player.w/2)-(boss.x+30));
-  const reach=hasOnion?145:105;
+  const reach=hasOnion?390:300;
   if(distance<=reach){
-    const damage=hasOnion?12:8;
-    boss.hp=Math.max(0,boss.hp-damage);boss.flash=12;
-    say(hasOnion?"🥢 传奇大葱普通攻击！Boss -12 HP":"普通攻击命中！Boss -8 HP");
+    const damage=chargeBuffTimer>0?chargedAttackDamage:baseAttackDamage;
+    boss.hp=Math.max(0,boss.hp-damage);boss.flash=14;
+    say(`大葱普通攻击！Boss -${damage} HP${chargeBuffTimer>0?"（强化）":""}`);
     if(boss.hp<=0)say("邪恶团子被击败了！走到终点完成关卡！");
-  }else say("再靠近邪恶团子一点才能打中！");
+  }else say("攻击挥空！");
+}
+function grantBossUpgrade(){
+  if(bossUpgrade)return;
+  bossUpgrade=true;
+  localStorage.setItem(BOSS_UPGRADE_KEY,"yes");
+  playerMaxHp=BASE_PLAYER_HP*1.5;
+  bossPlayerHp=playerMaxHp;finalHp=bossPlayerHp;
+  baseAttackDamage=10*1.5;
+  chargedAttackDamage=20*1.5;
+  chargedSkillDamage=70*1.5;
+  ultimateDamage=400*1.5;
+  ultimateDuration=4*1.5;
+  say("🏆 击败邪恶团子！团子基础属性永久提升50%：最大生命、普攻、蓄力技能、大招伤害和大招无敌时间！生命已恢复满值。");
+  updateUI();
+}
+function activateUltimate(){
+  if(state!=="play"||!hasOnion||ultimateCooldownTimer>0||ultimateActive)return;
+  if(level!==5&&level!==6){say("🌪️ 大招仅在Boss战中可用！");return;}
+  const targetX=level===6?finalBoss.x:boss.x+30;
+  const delta=targetX-(player.x+player.w/2);
+  const dir=delta===0?(player.facing||1):Math.sign(delta);
+  player.facing=dir;
+  // 瞬移到Boss近身位置，再发动连续斩击；不会穿过或修改关卡机关。
+  const desired=targetX-dir*145-player.w/2;
+  player.x=level===6?Math.max(0,Math.min(900-player.w,desired)):Math.max(0,Math.min(LEVEL_LENGTH-player.w,desired));
+  player.y=GROUND-player.h;player.vx=0;player.vy=0;player.onGround=true;
+  ultimateLockX=player.x;ultimateLockY=player.y;
+  ultimateActive=true;ultimateTimer=ultimateDuration;ultimateStartTime=0;ultimateHitDone=false;
+  ultimateCooldownTimer=ultimateCooldown;
+  if(level===5&&boss.hp>0){boss.hp=Math.max(0,boss.hp-ultimateDamage);boss.flash=30;ultimateHitDone=true;}
+  else if(level===6&&finalBoss.hp>0&&!finalBoss.locked){finalBoss.hp=Math.max(finalBoss.maxHp*.4,finalBoss.hp-ultimateDamage);finalBoss.flash=.45;ultimateHitDone=true;}
+  say(ultimateHitDone?`🌪️ 传奇大葱·瞬斩！瞬移无敌中，造成 ${ultimateDamage} 点伤害！`:"🌪️ 传奇大葱·瞬斩！瞬移无敌中！");
+  for(let i=0;i<42;i++)finalParticles.push({x:player.x+player.w/2,y:player.y+player.h/2,vx:(Math.random()-.5)*520,vy:(Math.random()-.5)*520,life:.9});
+  updateUI();
 }
 function rectHit(a,b){
   return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
@@ -766,6 +815,14 @@ function update(dt){
   frame+=dt*60;
   if(invincible>0)invincible-=dt*60;
   if(attackCooldown>0)attackCooldown=Math.max(0,attackCooldown-dt*60);
+  if(ultimateCooldownTimer>0)ultimateCooldownTimer=Math.max(0,ultimateCooldownTimer-dt);
+  if(chargeBuffTimer>0){chargeBuffTimer=Math.max(0,chargeBuffTimer-dt);}
+  if(ultimateActive){
+    ultimateTimer=Math.max(0,ultimateTimer-dt);
+    ultimateStartTime+=dt;
+    player.x=ultimateLockX;player.y=ultimateLockY;player.vx=0;player.vy=0;player.onGround=true;
+    if(ultimateTimer<=0){ultimateActive=false;say("🌪️ 瞬斩结束！可以继续行动。");}
+  }
   if(onionSkillCooldown>0){
     onionSkillCooldown=Math.max(0,onionSkillCooldown-dt);
     if(!onionCharging&&hasOnion){
@@ -774,11 +831,11 @@ function update(dt){
     }
   }
   if(onionCharging){
-    onionChargeTime=Math.min(3,onionChargeTime+dt);
-    const pct=Math.floor(onionChargeTime/3*100);
+    onionChargeTime=Math.min(ONION_CHARGE_SECONDS,onionChargeTime+dt);
+    const pct=Math.floor(onionChargeTime/ONION_CHARGE_SECONDS*100);
     const b=document.getElementById("onionSkill");
     if(b)b.textContent=`🥢 蓄力 ${pct}%`;
-    if(onionChargeTime>=3){
+    if(onionChargeTime>=ONION_CHARGE_SECONDS){
       onionCharging=false;onionChargeTime=0;
       if(b)b.classList.remove("charging");
       hitBossWithOnionSkill();
@@ -843,6 +900,7 @@ function update(dt){
     player.vy=0;
     player.onGround=true;
   }
+  if(ultimateActive){player.x=ultimateLockX;player.y=ultimateLockY;player.vx=0;player.vy=0;player.onGround=true;}
   // 火箭背包可重复使用：落地后自动缓慢充能
   if(cheated&&player.onGround){
     fuel=Math.min(MAX_FUEL,fuel+2.4*dt*60);
@@ -924,36 +982,38 @@ function update(dt){
     boss.phase+=dt*2.2;
     if(boss.charge>0){
       boss.charge-=dt;
-      boss.x+=boss.chargeDir*520*dt;
-      if(Math.abs(player.x-boss.x)<92 && player.y+player.h>GROUND-125)hit();
+      boss.x+=boss.chargeDir*620*dt;
+      if(Math.abs(player.x-boss.x)<108 && player.y+player.h>GROUND-135)hit();
       if(boss.charge<=0){
         boss.x=Math.max(520,Math.min(LEVEL_LENGTH-420,boss.x));
-        boss.attackTimer=0.65;
+        boss.attackTimer=0.8;
+      }
+    }else if(boss.windup>0){
+      boss.windup-=dt;
+      if(boss.windup<=0){
+        if(boss.pendingSkill===0){
+          for(let i=-1;i<=1;i++){
+            const dx=(player.x+player.w/2)-(boss.x+62);
+            bossProjectiles.push({x:boss.x+62,y:GROUND-80+i*25,vx:Math.sign(dx||-1)*(330+Math.abs(i)*45),vy:i*95,life:4.5,r:18,kind:"fire"});
+          }
+          say("🔥 三连暗影火球已发射！快闪避！");
+        }else if(boss.pendingSkill===1){
+          bossProjectiles.push({x:boss.x-80,y:GROUND-15,vx:player.x<boss.x?-440:440,vy:0,life:4.5,r:27,kind:"wave"});
+          say("⚡ 地面毁灭冲击波！跳起来躲开！");
+        }else{
+          boss.charge=1.05;
+          boss.chargeDir=player.x<boss.x?-1:1;
+          say("💢 邪恶团子发动狂暴冲锋！");
+        }
+        boss.pendingSkill=-1;
       }
     }else if(boss.skillTimer<=0){
-      const roll=Math.floor(Math.random()*3);
-      if(roll===0){
-        for(let i=-1;i<=1;i++){
-          const dx=(player.x+player.w/2)-(boss.x+62);
-          bossProjectiles.push({
-            x:boss.x+62,y:GROUND-80+i*23,
-            vx:Math.sign(dx||-1)*(260+Math.abs(i)*35),
-            vy:i*75,life:4.2,r:14,kind:"fire"
-          });
-        }
-        say("🔥 邪恶团子：三连暗影火球！");
-      }else if(roll===1){
-        bossProjectiles.push({
-          x:boss.x-80,y:GROUND-15,vx:player.x<boss.x?-360:360,
-          vy:0,life:4.5,r:20,kind:"wave"
-        });
-        say("⚡ 地面冲击波！跳起来躲开！");
-      }else{
-        boss.charge=0.72;
-        boss.chargeDir=player.x<boss.x?-1:1;
-        say("💢 邪恶团子正在蓄力冲锋！快躲开！");
-      }
-      boss.skillTimer=3.4+Math.random()*1.0;
+      boss.pendingSkill=Math.floor(Math.random()*3);
+      boss.windup=1.65;
+      if(boss.pendingSkill===0)say("⚠️ 邪恶团子凝聚暗影火球！准备躲避三连射击！");
+      else if(boss.pendingSkill===1)say("⚠️ 邪恶团子正在蓄积地面冲击波！准备跳跃！");
+      else say("⚠️ 邪恶团子压低身体，正在蓄力冲锋！快拉开距离或跳起！");
+      boss.skillTimer=4.8+Math.random()*1.2;
     }
     bossProjectiles.forEach(p=>{
       p.x+=p.vx*dt;
@@ -971,13 +1031,14 @@ function update(dt){
     bossProjectiles=bossProjectiles.filter(p=>p.life>0);
     if(Math.abs(player.x-boss.x)<92&&player.y+player.h>GROUND-125)hit();
   }
+  if(ultimateActive){player.x=ultimateLockX;player.y=ultimateLockY;player.vx=0;player.vy=0;player.onGround=true;}
   if(player.y>H+80){
     hit();
     player.y=GROUND-player.h;
     player.vy=0;
   }
   if(level<=3&&player.x>=LEVEL_LENGTH-120)completeStage();
-  if(level===5&&boss.hp<=0&&player.x>=LEVEL_LENGTH-120)completeStage();
+  if(level===5&&boss.hp<=0){grantBossUpgrade();if(player.x>=LEVEL_LENGTH-120)completeStage();}
   updateUI();
 }
 function completeStage(){
@@ -1220,6 +1281,8 @@ function bindHold(id,key){
 bindHold("left","left");
 bindHold("right","right");
 bindHold("jump","jump");
+const ultimateButton=document.getElementById("ultimateSkill");
+ultimateButton.addEventListener("pointerdown",e=>{e.preventDefault();activateUltimate();});
 const onionSkillButton=document.getElementById("onionSkill");
 onionSkillButton.addEventListener("pointerdown",e=>{
   e.preventDefault();
@@ -1243,6 +1306,7 @@ window.addEventListener("keydown",e=>{
   }
   if(e.code==="KeyJ")attack();
   if(e.code==="KeyL"&&!e.repeat)startOnionCharge();
+  if(e.code==="KeyK"&&!e.repeat)activateUltimate();
   if(e.code==="Escape"&&state==="play"){
     state="paused";previousState="play";showPanel("rulesPanel");
   }
@@ -1357,12 +1421,12 @@ window.tuanziGame={
 const baseUpdate=update;
 const baseDraw=draw;
 function damageFinalPlayer(amount,reason){
-  if(finalInvuln>0||state!=="play")return;
-  finalHp=Math.max(0,finalHp-amount);finalInvuln=.55;
+  if(finalInvuln>0||ultimateActive||state!=="play")return;
+  bossPlayerHp=Math.max(0,bossPlayerHp-amount);finalHp=bossPlayerHp;finalInvuln=.55;
   player.vy=-5.2;player.vx=player.x<finalBoss.x?-3.5:3.5;
-  document.getElementById("playerHp").textContent=Math.ceil(finalHp);
+  document.getElementById("playerHp").textContent=Math.ceil(bossPlayerHp);
   say(reason||"邪眼攻击命中！注意躲避！");
-  if(finalHp<=0){state="lose";document.getElementById("endIcon").textContent="💀";document.getElementById("endTitle").textContent="被邪眼吞噬！";document.getElementById("endText").textContent="团子倒在了最终战场。调整策略，再来挑战邪眼吧！";showPanel("ending");}
+  if(bossPlayerHp<=0){state="lose";document.getElementById("endIcon").textContent="💀";document.getElementById("endTitle").textContent="被邪眼吞噬！";document.getElementById("endText").textContent="团子倒在了最终战场。调整策略，再来挑战邪眼吧！";showPanel("ending");}
 }
 function updateFinalBoss(dt){
   if(!finalBoss.active||state!=="play")return;
@@ -1372,17 +1436,21 @@ function updateFinalBoss(dt){
   finalBoss.x=760+(finalBoss.phase===2?Math.sin(finalTime*1.4)*42:Math.sin(finalTime*.65)*18);
   if(finalBoss.hp<=finalBoss.maxHp*.4&&finalBoss.phase===1&&!finalBoss.locked){finalBoss.hp=finalBoss.maxHp*.4;finalBoss.locked=true;finalBoss.dialog=3.6;say("邪眼：你竟然能伤到我？现在，见识真正的黑暗！");}
   if(finalBoss.locked){finalBoss.dialog-=dt;if(finalBoss.dialog<=0){finalBoss.locked=false;finalBoss.phase=2;finalBoss.poisonTimer=1.1;finalBoss.protocolTimer=3.5;finalBoss.laserTimer=2.4;finalBoss.orbTimer=2.8;say("⚠ 邪眼进入狂暴形态！所有技能加速！");}return;}
-  const rage=finalBoss.phase===2;const mult=rage?1:1;
+  const rage=finalBoss.phase===2;
   finalBoss.poisonTimer-=dt;finalBoss.protocolTimer-=dt;finalBoss.laserTimer-=dt;finalBoss.orbTimer-=dt;
-  if(finalBoss.poisonTimer<=0){finalBoss.poisonTimer=rage?2.4:4.8;finalBoss.poisonZones.push({x:Math.max(8,Math.min(820,player.x-52)),y:GROUND-4,w:145,timer:3.1});say("☠ 邪眼释放腐蚀毒雾！离开紫色区域！");}
-  if(finalBoss.protocolTimer<=0){finalBoss.protocolTimer=rage?5.0:8.5;player.isReversed=true;player.reverseTimer=rage?3.2:2.6;say("⛧ 黑暗协议展开！左右方向暂时反转！");}
-  if(finalBoss.laserTimer<=0){finalBoss.laserTimer=rage?3.2:5.6;finalBoss.lasers.push({y:Math.max(80,Math.min(GROUND-55,player.y+player.h/2)),state:"warn",timer:1.15});say("👁️ 斜眼激光锁定！立刻跳跃或移动！");}
-  if(finalBoss.orbTimer<=0){finalBoss.orbTimer=rage?3.0:5.2;const dx=(player.x+player.w/2)-finalBoss.x,dy=(player.y+player.h/2)-finalBoss.y;const len=Math.max(1,Math.hypot(dx,dy));finalBoss.orbs=finalBoss.orbs||[];finalBoss.orbs.push({x:finalBoss.x,y:finalBoss.y,vx:dx/len*260,vy:dy/len*260,life:4,r:15});say("🟣 邪眼发射追踪暗影球！");}
-  finalBoss.poisonZones.forEach(z=>{z.timer-=dt;if(player.x+player.w>z.x&&player.x<z.x+z.w&&player.y+player.h>GROUND-65)if(finalInvuln<=0)damageFinalPlayer(4,"☠ 毒雾正在腐蚀血量！快离开毒区！");});
+  // 毒雾、黑暗协议、追踪球均先出现明确预警，再执行攻击。
+  if(finalBoss.poisonTimer<=0&&finalBoss.poisonWarn<=0){finalBoss.poisonWarn=1.55;finalBoss.poisonX=Math.max(8,Math.min(820,player.x-52));finalBoss.poisonTimer=rage?3.0:5.6;say("⚠️ 邪眼锁定地面！紫色毒雾即将爆发，立刻离开标记区域！");}
+  if(finalBoss.poisonWarn>0){finalBoss.poisonWarn-=dt;if(finalBoss.poisonWarn<=0){finalBoss.poisonZones.push({x:finalBoss.poisonX,y:GROUND-4,w:165,timer:3.4});say("☠ 腐蚀毒雾爆发！离开紫色区域！");}}
+  if(finalBoss.protocolTimer<=0&&finalBoss.protocolWarn<=0){finalBoss.protocolWarn=1.4;finalBoss.protocolTimer=rage?5.8:9.2;say("⚠️ 邪眼正在展开黑暗协议！方向即将反转，准备适应操作！");}
+  if(finalBoss.protocolWarn>0){finalBoss.protocolWarn-=dt;if(finalBoss.protocolWarn<=0){player.isReversed=true;player.reverseTimer=rage?3.6:3.0;say("⛧ 黑暗协议生效！左右方向暂时反转！");}}
+  if(finalBoss.laserTimer<=0){finalBoss.laserTimer=rage?3.8:6.2;finalBoss.lasers.push({y:Math.max(80,Math.min(GROUND-55,player.y+player.h/2)),state:"warn",timer:1.75});say("👁️ 斜眼激光锁定！红色瞄准线出现后立刻跳跃或移动！");}
+  if(finalBoss.orbTimer<=0&&finalBoss.orbWarn<=0){finalBoss.orbWarn=1.35;finalBoss.orbTimer=rage?3.6:5.8;say("⚠️ 邪眼正在凝聚追踪暗影球！准备横向闪避！");}
+  if(finalBoss.orbWarn>0){finalBoss.orbWarn-=dt;if(finalBoss.orbWarn<=0){const dx=(player.x+player.w/2)-finalBoss.x,dy=(player.y+player.h/2)-finalBoss.y;const len=Math.max(1,Math.hypot(dx,dy));finalBoss.orbs=finalBoss.orbs||[];finalBoss.orbs.push({x:finalBoss.x,y:finalBoss.y,vx:dx/len*330,vy:dy/len*330,life:4.5,r:20});say("🟣 追踪暗影球发射！快闪避！");}}
+  finalBoss.poisonZones.forEach(z=>{z.timer-=dt;if(player.x+player.w>z.x&&player.x<z.x+z.w&&player.y+player.h>GROUND-65)if(finalInvuln<=0)damageFinalPlayer(7,"☠ 毒雾正在腐蚀血量！快离开毒区！");});
   finalBoss.poisonZones=finalBoss.poisonZones.filter(z=>z.timer>0);
-  finalBoss.lasers.forEach(l=>{l.timer-=dt;if(l.state==="warn"&&l.timer<=0){l.state="fire";l.timer=.48;}else if(l.state==="fire"){if(Math.abs(player.y+player.h/2-l.y)<27)damageFinalPlayer(28,"💥 斜眼激光命中！");}});
+  finalBoss.lasers.forEach(l=>{l.timer-=dt;if(l.state==="warn"&&l.timer<=0){l.state="fire";l.timer=.55;}else if(l.state==="fire"){if(Math.abs(player.y+player.h/2-l.y)<30)damageFinalPlayer(40,"💥 斜眼激光重击！");}});
   finalBoss.lasers=finalBoss.lasers.filter(l=>l.timer>0);
-  finalBoss.orbs=(finalBoss.orbs||[]).filter(o=>{o.x+=o.vx*dt;o.y+=o.vy*dt;o.life-=dt;if(Math.abs(player.x+player.w/2-o.x)<26&&Math.abs(player.y+player.h/2-o.y)<26){damageFinalPlayer(18,"🟣 暗影球击中了团子！");return false;}return o.life>0&&o.x>-40&&o.x<W+40;});
+  finalBoss.orbs=(finalBoss.orbs||[]).filter(o=>{o.x+=o.vx*dt;o.y+=o.vy*dt;o.life-=dt;if(Math.abs(player.x+player.w/2-o.x)<30&&Math.abs(player.y+player.h/2-o.y)<30){damageFinalPlayer(28,"🟣 暗影球重击了团子！");return false;}return o.life>0&&o.x>-40&&o.x<W+40;});
   if(finalBoss.hp<=0){finalBoss.active=false;finalParticles.push({x:finalBoss.x,y:finalBoss.y,life:1.5,big:true});state="stage";completeStage();}
 }
 // 覆盖移动：第六关固定竞技场，反转效果只作用于方向输入
@@ -1396,10 +1464,35 @@ update=function(dt){
     player.x=Math.max(0,Math.min(900-player.w,player.x));scroll=0;
     updateFinalBoss(Math.min(dt,.035));
     if(player.isReversed){player.reverseTimer-=dt;if(player.reverseTimer<=0)player.isReversed=false;}
-    if(finalBoss.active&&Math.abs(player.x+player.w/2-finalBoss.x)<92&&Math.abs(player.y+player.h/2-finalBoss.y)<72)if(finalInvuln<=0)damageFinalPlayer(5,"👁️ 邪眼的眼压正在伤害你！");
+    if(finalBoss.active&&Math.abs(player.x+player.w/2-finalBoss.x)<92&&Math.abs(player.y+player.h/2-finalBoss.y)<72)if(finalInvuln<=0)damageFinalPlayer(9,"👁️ 邪眼的眼压正在重创团子！");
     updateUI();
   }else baseUpdate(dt);
 };
+function drawUltimateEffect(){
+  if(!ultimateActive)return;
+  const progress=1-ultimateTimer/ultimateDuration;
+  const cx=player.x-scroll+player.w/2,cy=player.y+player.h/2;
+  const dir=player.facing||1;
+  ctx.save();
+  // 瞬移残影与高速能量环
+  for(let i=0;i<5;i++){
+    const alpha=(1-progress)*.12+(Math.sin(frame*.12+i)*.035+.05);
+    ctx.globalAlpha=Math.max(.04,alpha);
+    ctx.fillStyle=i%2?"#c7f4ff":"#fff0a8";
+    ctx.beginPath();ctx.ellipse(cx-dir*(i+1)*18,cy,26+i*5,38+i*5,0,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  const sweep=(progress*5.5)%1;
+  ctx.translate(cx,cy);ctx.scale(dir,1);
+  ctx.strokeStyle="#fff7c2";ctx.lineWidth=12;ctx.shadowColor="#8eeaff";ctx.shadowBlur=28;
+  ctx.beginPath();ctx.arc(0,0,72,-1.35+sweep*.3,1.25+sweep*.3);ctx.stroke();
+  ctx.strokeStyle="#a7e8ff";ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(12,-58);ctx.quadraticCurveTo(125,-8,18,62);ctx.stroke();
+  ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(22,-38);ctx.lineTo(148,0);ctx.lineTo(22,38);ctx.stroke();
+  ctx.restore();
+  ctx.save();ctx.fillStyle="rgba(70,180,255,.18)";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#fff";ctx.font="bold 22px Arial";ctx.textAlign="center";ctx.shadowColor="#65dfff";ctx.shadowBlur=16;
+  ctx.fillText("🌪️ 传奇大葱·瞬斩！",W/2,112);ctx.restore();
+}
 function drawEvilDangoBoss(){
   const bx=boss.x-scroll+30,by=GROUND-147;const rage=boss.hp<boss.maxHp*.35;ctx.save();ctx.translate(bx,by);
   ctx.globalAlpha=.35;ctx.fillStyle=rage?"#ff163d":"#7b35b8";ctx.beginPath();ctx.ellipse(0,145,100,24,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
@@ -1412,7 +1505,7 @@ function drawEvilDangoBoss(){
   ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(0,45,42,31,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=rage?"#ff183c":"#9b32d5";ctx.beginPath();ctx.arc(0,45,23,0,Math.PI*2);ctx.fill();ctx.fillStyle="#130815";ctx.beginPath();ctx.ellipse(0,45,8,20,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-7,34,5,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle="#220c2b";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-22,100);ctx.quadraticCurveTo(0,122,24,98);ctx.stroke();ctx.restore();
   bossProjectiles.forEach(p=>{ctx.fillStyle=p.kind==="wave"?"#ffbd4b":"#ff6c8d";ctx.beginPath();if(p.kind==="wave")ctx.ellipse(p.x-scroll,p.y,25,12,0,0,Math.PI*2);else ctx.arc(p.x-scroll,p.y,p.r||14,0,Math.PI*2);ctx.fill();});
-  if(boss.charge>0){ctx.fillStyle="rgba(255,45,90,.22)";ctx.fillRect(0,GROUND-35,W,35);ctx.fillStyle="#ff7894";ctx.font="bold 18px Arial";ctx.textAlign="center";ctx.fillText("⚠ 邪恶团子冲锋！",W/2,GROUND-45);}
+  if(boss.windup>0){ctx.fillStyle="rgba(255,190,55,.18)";ctx.fillRect(0,0,W,H);ctx.fillStyle="#ffe17a";ctx.font="bold 23px Arial";ctx.textAlign="center";ctx.fillText("⚠ Boss 正在蓄力！准备躲避！",W/2,GROUND-55);}if(boss.charge>0){ctx.fillStyle="rgba(255,45,90,.28)";ctx.fillRect(0,GROUND-45,W,45);ctx.fillStyle="#ff7894";ctx.font="bold 20px Arial";ctx.textAlign="center";ctx.fillText("⚠ 邪恶团子冲锋！",W/2,GROUND-55);}
   // 顶部Boss血条
   ctx.fillStyle="rgba(18,8,28,.88)";ctx.fillRect(14,12,W-28,46);ctx.fillStyle="#fff";ctx.font="bold 18px Arial";ctx.textAlign="left";ctx.fillText("👑 邪恶团子 · 第五关Boss",28,32);ctx.textAlign="right";ctx.fillText(Math.ceil(boss.hp)+" / "+boss.maxHp,W-28,32);ctx.textAlign="left";ctx.fillStyle="#45213f";ctx.fillRect(28,40,W-56,9);const gr=ctx.createLinearGradient(28,0,W-28,0);gr.addColorStop(0,"#ff2c63");gr.addColorStop(1,"#ffb45b");ctx.fillStyle=gr;ctx.fillRect(28,40,(W-56)*Math.max(0,boss.hp/boss.maxHp),9);
 }
@@ -1423,6 +1516,7 @@ function drawFinalArena(){
   for(let i=0;i<30;i++){const x=(i*71+finalTime*18)%W,y=(i*43+Math.sin(finalTime+i)*20)%GROUND;ctx.fillStyle="rgba(220,125,255,.35)";ctx.fillRect(x,y,2,2);}
   ctx.fillStyle="#21102e";ctx.fillRect(0,GROUND,W,H-GROUND);ctx.fillStyle="#682d79";ctx.fillRect(0,GROUND,W,8);
   // 腐蚀区
+  if(finalBoss.poisonWarn>0){ctx.fillStyle="rgba(255,210,70,.22)";ctx.fillRect(finalBoss.poisonX,GROUND-42,165,42);ctx.strokeStyle="#ffe17a";ctx.lineWidth=3;ctx.setLineDash([8,7]);ctx.strokeRect(finalBoss.poisonX,GROUND-42,165,42);ctx.setLineDash([]);}
   finalBoss.poisonZones.forEach(z=>{ctx.fillStyle="rgba(140,35,190,.34)";ctx.beginPath();ctx.ellipse(z.x+z.w/2,GROUND-8,z.w/2,30,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="rgba(203,84,255,.22)";ctx.fillRect(z.x,GROUND-18,z.w,12);});
   // 激光预警/发射
   finalBoss.lasers.forEach(l=>{if(l.state==="warn"){ctx.strokeStyle="rgba(255,65,95,.9)";ctx.lineWidth=4;ctx.setLineDash([12,10]);ctx.beginPath();ctx.moveTo(0,l.y);ctx.lineTo(W,l.y);ctx.stroke();ctx.setLineDash([]);}else{ctx.fillStyle="rgba(255,30,65,.82)";ctx.fillRect(0,l.y-23,W,46);ctx.fillStyle="#fff";ctx.fillRect(0,l.y-7,W,14);}});
@@ -1439,6 +1533,7 @@ function drawFinalArena(){
   // 暗影球
   (finalBoss.orbs||[]).forEach(o=>{const gg=ctx.createRadialGradient(o.x-4,o.y-4,2,o.x,o.y,o.r);gg.addColorStop(0,"#fff");gg.addColorStop(.3,"#d58cff");gg.addColorStop(1,"#5d148e");ctx.fillStyle=gg;ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.fill();});
   // Boss血条和阶段提示
+  if(finalBoss.protocolWarn>0||finalBoss.orbWarn>0){ctx.fillStyle="rgba(255,190,70,.92)";ctx.font="bold 18px Arial";ctx.textAlign="center";ctx.fillText(finalBoss.protocolWarn>0?"⚠ 黑暗协议蓄力中！":"⚠ 追踪暗影球蓄力中！",480,112);}
   ctx.fillStyle="rgba(10,4,20,.88)";ctx.fillRect(120,14,720,42);ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 20px Arial";ctx.fillText("👁️ 终极邪眼 · 最终Boss",480,31);ctx.fillStyle="#472044";ctx.fillRect(145,39,670,10);const hpw=670*Math.max(0,finalBoss.hp/finalBoss.maxHp);const gg=ctx.createLinearGradient(145,0,815,0);gg.addColorStop(0,"#ff174f");gg.addColorStop(1,"#d68aff");ctx.fillStyle=gg;ctx.fillRect(145,39,hpw,10);ctx.textAlign="left";ctx.font="bold 14px Arial";ctx.fillText("阶段："+(finalBoss.phase===2?"狂暴形态":"封印形态")+"　"+Math.ceil(finalBoss.hp)+" / "+finalBoss.maxHp,145,76);
   if(finalBoss.locked){ctx.fillStyle="rgba(0,0,0,.76)";ctx.fillRect(110,365,740,70);ctx.strokeStyle="#ff4e87";ctx.lineWidth=2;ctx.strokeRect(110,365,740,70);ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 21px Arial";ctx.fillText("邪眼：你竟然能伤到我？现在，见识真正的黑暗！",480,407);}
   // 玩家
@@ -1448,8 +1543,8 @@ function drawFinalArena(){
   finalParticles=finalParticles.filter(p=>{p.life-=.016;if(!p.big){p.x+=p.vx*.016;p.y+=p.vy*.016;ctx.fillStyle="#f9a6ff";ctx.fillRect(p.x,p.y,4,4);}return p.life>0;});
 }
 draw=function(){
-  if(level!==6){baseDraw();if(level===5)drawEvilDangoBoss();return;}
-  drawFinalArena();
+  if(level!==6){baseDraw();if(level===5)drawEvilDangoBoss();drawUltimateEffect();return;}
+  drawFinalArena();drawUltimateEffect();
 };
 // 触屏松手按钮：避免推箱或移动时持续输入
 const releaseBtn=document.getElementById("release");if(releaseBtn)releaseBtn.onclick=()=>{holding.left=false;holding.right=false;holding.jump=false;player.vx=0;say("已松开操作键。");};
@@ -1468,7 +1563,7 @@ requestAnimationFrame(loop);
   "startAdventure", "welcomeTutorial", "tutorialStart", "welcomeShop", "welcomeDisclaimer",
   "shopBack", "rulesBack", "nextStage", "endingRestart", "endingShop",
   "endingHome", "disclaimerBack", "restart", "shopButton", "rulesButton",
-  "redeem", "disclaimerButton"
+  "redeem", "disclaimerButton", "ultimateSkill"
   ];
   menuButtonIds.forEach(function (id) {
     const element = document.getElementById(id);
