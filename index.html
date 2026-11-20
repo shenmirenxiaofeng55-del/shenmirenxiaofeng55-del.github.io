@@ -523,7 +523,7 @@ function makeLevel(){
       x:220+i*115,y:GROUND-48,got:false
     });
     obstacles=[{
-      x:850,w:50,h:42,type:"spike",moving:false,phase:0
+      x:850,w:50,h:42,type:"spike",moving:false,phase:0,disabledTimer:0
     }
     ];
   }
@@ -805,21 +805,27 @@ function update(dt){
   player.x+=player.vx*dt*60;
   player.x=Math.max(level===4?-470:0,Math.min(LEVEL_LENGTH-player.w,player.x));
   if(level===4){
-    const boxLeft=crate.x;
-    const boxRight=crate.x+crate.w;
+    const oldBoxX=crate.x;
+    const boxLeft=oldBoxX;
+    const boxRight=oldBoxX+crate.w;
     const nextRight=player.x+player.w;
     const nextLeft=player.x;
-    const verticalTouch=player.y+player.h>GROUND-crate.h+5;
-    if(verticalTouch && nextRight>boxLeft && nextLeft<boxRight){
-      if(player.vx>0 && previousX+player.w<=boxLeft+4){
-        crate.x+=player.x-previousX;
+    const verticalTouch=player.y+player.h>GROUND-crate.h+5 &&
+      player.y<GROUND-4;
+    const overlapsBox=nextRight>boxLeft+1 && nextLeft<boxRight-1;
+    if(verticalTouch && overlapsBox){
+      const movingRight=player.vx>0.05;
+      const movingLeft=player.vx<-0.05;
+      // 允许玩家贴着箱子持续推，不依赖某一帧必须刚好碰到箱边。
+      if(movingRight && previousX+player.w<=boxRight){
+        crate.x=Math.max(180,Math.min(1450,oldBoxX+(player.x-previousX)));
         player.x=crate.x-player.w;
-      }
-      else if(player.vx<0 && previousX>=boxRight-4){
-        crate.x+=player.x-previousX;
+        if(crate.x>=1450-0.01)player.vx=0;
+      }else if(movingLeft && previousX>=boxLeft-player.w){
+        crate.x=Math.max(180,Math.min(1450,oldBoxX+(player.x-previousX)));
         player.x=crate.x+crate.w;
-      }
-      else{
+        if(crate.x<=180+0.01)player.vx=0;
+      }else{
         player.x=previousX;
         player.vx=0;
       }
@@ -843,14 +849,21 @@ function update(dt){
   }
   scroll=Math.max(level===4?-500:0,Math.min(LEVEL_LENGTH-W,player.x-270));
   // 陷阱
+  // 第四关：箱子压住尖刺时，尖刺失效 3 秒；持续压住会刷新时间。
   obstacles.forEach(o=>{
     let y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);
-    const bx=o.x-scroll;
+    if(typeof o.disabledTimer!=="number")o.disabledTimer=0;
+    if(level===4 && o.type==="spike"){
+      const crateOverlapX=crate.x<o.x+o.w && crate.x+crate.w>o.x;
+      const crateOnGround=Math.abs(crate.y-(GROUND-crate.h))<8;
+      if(crateOverlapX && crateOnGround)o.disabledTimer=3.0;
+    }
+    if(o.disabledTimer>0)o.disabledTimer=Math.max(0,o.disabledTimer-dt);
     if(o.type==="spike"){
       const crateCoversSpike=level===4 &&
         crate.x<o.x+o.w+crate.w*0.15 &&
         crate.x+crate.w>o.x-o.w*0.15;
-      if(!crateCoversSpike &&
+      if(o.disabledTimer<=0 && !crateCoversSpike &&
          player.x+player.w-8>o.x+7&&player.x+8<o.x+o.w-7&&
          player.y+player.h>y+12)hit();
     }else if(rectHit({
@@ -1062,7 +1075,13 @@ function draw(){
   });
   obstacles.forEach(o=>{
     let x=o.x-scroll,y=GROUND-o.h+(o.moving?Math.sin(frame*.035+o.phase)*16:0);if(o.type==="spike"){
-      ctx.fillStyle="#ed4769";ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
+      if(o.disabledTimer>0){
+        // 尖刺失效时变成灰色半透明，视觉上提示可以安全通过。
+        ctx.save();ctx.globalAlpha=0.45;ctx.fillStyle="#9aa6b8";
+        ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();ctx.restore();
+      }else{
+        ctx.fillStyle="#ed4769";ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,GROUND);ctx.fill();
+      }
     }else{
       ctx.fillStyle="#dc783e";ctx.fillRect(x,y,o.w,o.h);
     }
@@ -1308,9 +1327,14 @@ document.getElementById("disclaimerButton").onclick=()=>{
 }
 ;
 document.getElementById("disclaimerBack").onclick=()=>{
-  if(previousState==="play")state="play";
-  else if(previousState==="menu")showPanel("welcome");
-  else closePanel();
+  if(previousState==="play"){
+    state="play";
+    closePanel();
+  }else if(previousState==="menu"){
+    showPanel("welcome");
+  }else{
+    closePanel();
+  }
 }
 ;
 player={
